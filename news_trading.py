@@ -27,6 +27,27 @@ __MULTIPLIER__VALUE__ = {
                         }
 
 
+def get_tick_size(symbol: str) -> float:
+    """
+    Retrieves the tick size for a given symbol.
+
+    Args:
+        symbol (str): The symbol for which to retrieve the tick size.
+
+    Returns:
+        float: The tick size of the symbol.
+
+    Raises:
+        ValueError: If the symbol is not valid or not found.
+    """
+    mt5.symbol_select(symbol, True)
+    symbol_info = mt5.symbol_info(symbol)
+
+    if symbol_info is None:
+        raise ValueError(f"Symbol '{symbol}' is not valid or not found.")
+
+    tick_size = symbol_info.trade_tick_size
+    return tick_size
 def open_calc(path: str= "static/calc.xlsx", sheetname: str= "United States"):
     calc = pd.read_excel(path, sheet_name=sheetname)
     return calc
@@ -153,7 +174,7 @@ def trade_on_news(initialize, news, country, symbol, timeframe, risk, time_open)
     calc_df = open_calc(path='static/MinMax Strategy Back Test.xlsx', sheetname=country)
     positions= strategy(df= calc_df, symbol= symbol, news=news,
                         open_= open_, time_open=time_open,
-                        multiplier=__MULTIPLIER__VALUE__[symbol], timeframe=time_frame[timeframe], risk=risk)
+                        multiplier=get_tick_size(symbol), timeframe=time_frame[timeframe], risk=risk)
     return positions
 
 
