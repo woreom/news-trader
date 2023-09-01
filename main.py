@@ -103,29 +103,33 @@ if __name__ == "__main__":
     #               symbol= None, timeframe=None, risk=100, time_open=0)
     
     ############ test a random news ##############
-    # from news_trading import open_calc, strategy, get_tick_size
-    # open_ = 0
-    # risk = 100
-    # time_open = 0
-    # country='United States'
-    # news='Dallas Fed PCE'
-    # time_frame = {'30m':0.5,'1h': 1,'1.5h': 1.5, '2h': 2, '2.5h': 2.5, '3h': 3, '3.5h': 3.5, '4h': 4,
-    #               '0.5':0.5, '1': 1, "1.5": 1.5, '2': 2, "2.5": 2.5, "3": 3, "3.5": 3.5, "4": 4}
-    # calc_df = open_calc(path='static/MinMax Strategy Back Test.xlsx', sheetname=country)
+    from news_trading import open_calc, strategy, get_tick_size
+    open_ = 0
+    risk = 100
+    time_open = datetime.now()
+    country='United States'
+    news='Dallas Fed PCE'
+    time_frame = {'30m':0.5,'1h': 1,'1.5h': 1.5, '2h': 2, '2.5h': 2.5, '3h': 3, '3.5h': 3.5, '4h': 4,
+                  '0.5':0.5, '1': 1, "1.5": 1.5, '2': 2, "2.5": 2.5, "3": 3, "3.5": 3.5, "4": 4}
+    calc_df = open_calc(path='static/MinMax Strategy Back Test.xlsx', sheetname=country)
     
-   
-    # interest_rows = calc_df[calc_df['News'].str.contains(news)]
-    # interest_rows.sort_values(by=['Win Rate'], ascending = False, inplace=True)
-    # symbol = interest_rows["Symbol"].iloc[0]
-    # timeframe = interest_rows["News"].iloc[0].split("_")[-1]
-    # log(f"best symbol and timeframe by winrate: {symbol} and {timeframe}")
+    mt5.initialize()
+    mt5.login(login="51545562", password="zop7gsit", 
+              server="Alpari-MT5-Demo")
 
-    # positions= strategy(df= calc_df, symbol= symbol, news=news,
-    #                     open_= open_, time_open=time_open,
-    #                     multiplier=get_tick_size(symbol), timeframe=time_frame[timeframe], risk=risk)
-    
+    interest_rows = calc_df[calc_df['News'].str.contains(news)]
+    interest_rows.sort_values(by=['Win Rate'], ascending = False, inplace=True)
+    symbol = interest_rows["Symbol"].iloc[0]
+    timeframe = interest_rows["News"].iloc[0].split("_")[-1]
+    log(f"best symbol and timeframe by winrate: {symbol} and {timeframe}")
+
+    positions= strategy(df= calc_df, symbol= symbol, news=news,
+                        open_= open_, time_open=time_open,
+                        multiplier=get_tick_size(symbol), timeframe=time_frame[timeframe], risk=risk)
+    log(positions)
+
     ##### Run the bot for a day #####
-    run_bot(all_countries=['United States'], symbol=None, timeframe=None, risk=100)
+    # run_bot(all_countries=['United States'], symbol=None, timeframe=None, risk=100)
 
     
 
