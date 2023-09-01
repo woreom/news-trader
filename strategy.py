@@ -181,6 +181,7 @@ def Control_Position(initialize,  trade_info, max_pending_time=2*60, max_open_ti
     trade, request=Open_Position(trade_info)
     
     if request["action"]==mt5.TRADE_ACTION_PENDING:
+        log(f"The Trade {trade} is pending for {max_pending_time}\nMore Info:\n{request}")
         t1 = threading.Thread(target=Close_Position, args=(trade.order, request, 'Remove', trade_info['Currency'], max_pending_time))
         t1.start()
     
