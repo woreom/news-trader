@@ -85,6 +85,7 @@ def run_bot(all_countries=['United States'], symbol=None, timeframe=None, risk=1
 if __name__ == "__main__":
     import pytz
     
+    ########## test a news right now ##########
     # flag, positions = news_trader(initialize= ["51810268", "apmjgjp1", "Alpari-MT5-Demo"],
     #             countries= ['United States'],
     #             symbol= 'EURUSD',
@@ -94,10 +95,12 @@ if __name__ == "__main__":
 
     # log(positions)
 
+    ########### test a positions #############
     # trade_on_news(initialize= ["51810268", "apmjgjp1", "Alpari-MT5-Demo"],
     #               country='United States', news='OPEC Crude Oil Production Guinea',
     #               symbol= None, timeframe=None, risk=100, time_open=0)
     
+    ############ test a random news ##############
     # from news_trading import open_calc, strategy, get_tick_size
     # open_ = 0
     # risk = 100
@@ -119,6 +122,7 @@ if __name__ == "__main__":
     #                     open_= open_, time_open=time_open,
     #                     multiplier=get_tick_size(symbol), timeframe=time_frame[timeframe], risk=risk)
     
+    ##### Run the bot for a day #####
     run_bot(all_countries=['United States'], symbol=None, timeframe=None, risk=100)
 
     
