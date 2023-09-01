@@ -6,6 +6,8 @@ from datetime import datetime, timedelta
 from get_data import get_today_calendar
 from strategy import Control_Position
 
+import MetaTrader5 as mt5
+
 from news_trading import trade_on_news
 from utils import log
 
