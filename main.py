@@ -113,7 +113,10 @@ if __name__ == "__main__":
                   '0.5':0.5, '1': 1, "1.5": 1.5, '2': 2, "2.5": 2.5, "3": 3, "3.5": 3.5, "4": 4}
     calc_df = open_calc(path='static/MinMax Strategy Back Test.xlsx', sheetname=country)
     
-   
+    mt5.initialize()
+    mt5.login(login="51545562", password="zop7gsit", 
+              server="Alpari-MT5-Demo")
+
     interest_rows = calc_df[calc_df['News'].str.contains(news)]
     interest_rows.sort_values(by=['Win Rate'], ascending = False, inplace=True)
     symbol = interest_rows["Symbol"].iloc[0]
@@ -122,11 +125,11 @@ if __name__ == "__main__":
 
     positions= strategy(df= calc_df, symbol= symbol, news=news,
                         open_= open_, time_open=time_open,
-                        multiplier=0.01, timeframe=time_frame[timeframe], risk=risk)
+                        multiplier=get_tick_size(symbol), timeframe=time_frame[timeframe], risk=risk)
     log(positions)
 
     ##### Run the bot for a day #####
-    run_bot(all_countries=['United States'], symbol=None, timeframe=None, risk=100)
+    # run_bot(all_countries=['United States'], symbol=None, timeframe=None, risk=100)
 
     
 
