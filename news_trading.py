@@ -168,12 +168,8 @@ def strategy(df: pd.DataFrame, symbol: str, news: str, open_: float,
     return info
 
 def trade_on_news(initialize, news, country, risk, time_open, symbol=None, timeframe=None):
-    df = get_data_from_mt5(initialize, symbol, "5m")
-    open_ = df.iloc[-1]["Open"]
-    time_frame = {'30m':0.5,'1h': 1,'1.5h': 1.5, '2h': 2, '2.5h': 2.5, '3h': 3, '3.5h': 3.5, '4h': 4,
-                  '0.5':0.5, '1': 1, "1.5": 1.5, '2': 2, "2.5": 2.5, "3": 3, "3.5": 3.5, "4": 4}
     calc_df = open_calc(path='static/MinMax Strategy Back Test.xlsx', sheetname=country)
-    
+
     if timeframe == None or symbol == None:
         interest_rows = calc_df[calc_df['News'].str.contains(news)]
         interest_rows.sort_values(by=['Win Rate'], ascending = False, inplace=True)
@@ -181,6 +177,12 @@ def trade_on_news(initialize, news, country, risk, time_open, symbol=None, timef
         timeframe = interest_rows["News"].iloc[0].split("_")[-1]
         log(f"best symbol and timeframe by winrate: {symbol} and {timeframe}")
 
+    df = get_data_from_mt5(initialize, symbol, "5m")
+    open_ = df.iloc[-1]["Open"]
+    time_frame = {'30m':0.5,'1h': 1,'1.5h': 1.5, '2h': 2, '2.5h': 2.5, '3h': 3, '3.5h': 3.5, '4h': 4,
+                  '0.5':0.5, '1': 1, "1.5": 1.5, '2': 2, "2.5": 2.5, "3": 3, "3.5": 3.5, "4": 4}
+    
+    
     positions= strategy(df= calc_df, symbol= symbol, news=news,
                         open_= open_, time_open=time_open,
                         multiplier=get_tick_size(symbol), timeframe=time_frame[timeframe], risk=risk)
