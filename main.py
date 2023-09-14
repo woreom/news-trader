@@ -82,6 +82,9 @@ def run_bot(all_countries=['United States'], symbol=None, timeframe=None, risk=1
                 timezone= timezone)
         if positions != (): log(positions)
         sleep(30)
+        if flag:
+            sleep(6*60)
+
     
        
 if __name__ == "__main__":
