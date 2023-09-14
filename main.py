@@ -25,7 +25,7 @@ def news_trader(initialize, countries, symbol, timeframe, risk, timezone):
     diff_now_next_news = datetime.strptime(str(next_news["Date_Time"]), "%Y-%m-%d %H:%M:%S") - now.replace(tzinfo=None)
     diff_now_last_news = now.replace(tzinfo=None) - datetime.strptime(str(df["Date_Time"].iloc[news_index-1]), "%Y-%m-%d %H:%M:%S")
 
-    if True: #timedelta(minutes=0) <= diff_now_next_news <= timedelta(minutes=5):
+    if timedelta(minutes=0) <= diff_now_next_news <= timedelta(minutes=5):
         news_time = True
         log(f"country={next_news['Country']}, news={next_news['News']}, symbol= {symbol}, timeframe={timeframe}")
         positions = trade_on_news(initialize=initialize,
