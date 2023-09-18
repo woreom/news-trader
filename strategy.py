@@ -114,10 +114,10 @@ def Open_Position(trade_info):
         
     else:
         # Create a pending order
-        if True: #price > entry + min_distance:
+        if price > entry + min_distance:
             order_type = {"Buy": mt5.ORDER_TYPE_BUY_LIMIT, "Sell": mt5.ORDER_TYPE_SELL_STOP}
-        # else:
-        #     order_type = {"Buy": mt5.ORDER_TYPE_BUY_STOP, "Sell": mt5.ORDER_TYPE_SELL_LIMIT}
+        else:
+            order_type = {"Buy": mt5.ORDER_TYPE_BUY_STOP, "Sell": mt5.ORDER_TYPE_SELL_LIMIT}
             
         request = {
             "action": mt5.TRADE_ACTION_PENDING,
@@ -128,6 +128,7 @@ def Open_Position(trade_info):
             "sl": sl,  
             "tp": tp,
             "type_filling":mt5.ORDER_FILLING_IOC,
+            "comment": trade_info['News'],
 
         }
         
