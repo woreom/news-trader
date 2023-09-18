@@ -38,10 +38,10 @@ def news_trader(initialize, countries, symbol, timeframe, risk, timezone):
                           max_open_time=4*60*60)
     
     # if it's news is published to 4hour return true
-    # if timedelta(minutes=0) <= diff_now_last_news <= timedelta(hours=4):
-    #     news_time = True
-    # elif timedelta(minutes=0) <= diff_now_next_news <= timedelta(minutes=21):
-    #     news_time = True
+    if timedelta(minutes=0) <= diff_now_last_news <= timedelta(hours=4):
+        news_time = True
+    elif timedelta(minutes=0) <= diff_now_next_news <= timedelta(minutes=21):
+        news_time = True
     else:
         news_time = False
         
@@ -80,9 +80,10 @@ def run_bot(all_countries=['United States'], symbol=None, timeframe=None, risk=1
                 timeframe= timeframe,
                 risk= risk,
                 timezone= timezone)
-        if positions != (): log(positions)
+        # if positions != (): log(flag, positions)
+        log(flag, positions)
         sleep(30)
-        if flag: sleep(6*60)
+        if flag: sleep(5*60)  
 
     
        
