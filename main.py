@@ -139,7 +139,10 @@ if __name__ == "__main__":
     # log(positions)
 
     ##### Run the bot for a day #####
-    run_bot(all_countries=['United States'], symbol=None, timeframe=None, risk=100, num_positions=3)
+    run_bot(all_countries=['United States', 'United Kingdom', 'Euro Zone',
+                           'Germany', 'Switzerland', 'Canada', 
+                           'Australia', 'Japan', 'New Zealand', 'China'],
+                           symbol=None, timeframe=None, risk=100, num_positions=3)
 
     
 
