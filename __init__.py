@@ -17,6 +17,7 @@ from visualization import convet_dataframe_to_png
 
 from news_trading import (open_calc, strtotimedate, price_calc, isfloat,
                           get_mean_var, get_extra_points, calc_position_size,
-                          strategy, trade_on_news)
+                          strategy, trade_on_news, trade_i_positions_on_news)
 
-from main import news_trader
+from main import (news_trader,
+                  )

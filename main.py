@@ -8,10 +8,10 @@ from strategy import Control_Position
 
 import MetaTrader5 as mt5
 
-from news_trading import trade_on_news
+from news_trading import trade_on_news, trade_i_positions_on_news
 from utils import log
 
-def news_trader(initialize, countries, symbol, timeframe, risk, timezone):
+def news_trader(initialize, countries, symbol, timeframe, risk, timezone, num_positions=3):
     news_time = False
     positions = ()
     now = pd.Timestamp('today', tzinfo=timezone).replace(tzinfo=None)
@@ -25,17 +25,23 @@ def news_trader(initialize, countries, symbol, timeframe, risk, timezone):
     diff_now_next_news = datetime.strptime(str(next_news["Date_Time"]), "%Y-%m-%d %H:%M:%S") - now.replace(tzinfo=None)
     diff_now_last_news = now.replace(tzinfo=None) - datetime.strptime(str(df["Date_Time"].iloc[news_index-1]), "%Y-%m-%d %H:%M:%S")
 
-    if True: #timedelta(minutes=0) <= diff_now_next_news <= timedelta(minutes=5):
+    if timedelta(minutes=0) <= diff_now_next_news <= timedelta(minutes=5):
         news_time = True
         log(f"country={next_news['Country']}, news={next_news['News']}, symbol= {symbol}, timeframe={timeframe}")
-        positions = trade_on_news(initialize=initialize,
-                                  country=next_news['Country'], news=next_news['News'],
-                                  symbol= symbol, timeframe=timeframe, risk=risk, time_open=now)
         
-        Control_Position(initialize,  positions[0], max_pending_time=positions[0]['PendingTime'],
-                          max_open_time=4*60*60)
-        Control_Position(initialize,  positions[1], max_pending_time=positions[1]['PendingTime'],
-                          max_open_time=4*60*60)
+        # positions = trade_on_news(initialize=initialize,
+        #                           country=next_news['Country'], news=next_news['News'],
+        #                           symbol= symbol, timeframe=timeframe, risk=risk, time_open=now)
+        
+        positions = trade_i_positions_on_news(initialize=initialize,
+                                  country=next_news['Country'], news=next_news['News'],
+                                  num_positions= num_positions, risk=risk, time_open=now)
+        
+        for position in positions:
+            Control_Position(initialize,  position[0], max_pending_time=position[0]['PendingTime'],
+                            max_open_time=4*60*60)
+            Control_Position(initialize,  position[1], max_pending_time=position[1]['PendingTime'],
+                            max_open_time=4*60*60)
     
     # if it's news is published to 4hour return true
     # if timedelta(minutes=0) <= diff_now_last_news <= timedelta(hours=4):
@@ -68,7 +74,7 @@ def is_market_open():
     # shut down the connection to the MetaTrader 5 terminal
     mt5.shutdown()
 
-def run_bot(all_countries=['United States'], symbol=None, timeframe=None, risk=100):
+def run_bot(all_countries=['United States'], symbol=None, timeframe=None, risk=100, num_positions=3):
     message = "Starting Bot ..."
     log(message)
     timezone = pytz.timezone('Asia/Tehran')
@@ -79,7 +85,8 @@ def run_bot(all_countries=['United States'], symbol=None, timeframe=None, risk=1
                 symbol= symbol,
                 timeframe= timeframe,
                 risk= risk,
-                timezone= timezone)
+                timezone= timezone,
+                num_positions= num_positions)
         # if positions != (): log(flag, positions)
         log(flag, positions)
         sleep(30)
@@ -132,7 +139,7 @@ if __name__ == "__main__":
     # log(positions)
 
     ##### Run the bot for a day #####
-    run_bot(all_countries=['United States'], symbol=None, timeframe=None, risk=100)
+    run_bot(all_countries=['United States'], symbol=None, timeframe=None, risk=100, num_positions=3)
 
     
 

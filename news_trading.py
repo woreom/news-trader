@@ -195,15 +195,16 @@ def trade_i_positions_on_news(initialize, news, country, risk, time_open, num_po
     interest_rows.sort_values(by=['Win Rate'], ascending = False, inplace=True)
     symbols = [interest_rows["Symbol"].iloc[i] for i in range(num_positions)]
     timeframes = [interest_rows["News"].iloc[i].split("_")[-1] for i in range(num_positions)]
+    winrates = [interest_rows["Win Rate"].iloc[i] for i in range(num_positions)]
     log(f"best symbol and timeframe by winrate: {symbols} and {timeframes}")
 
-    df = get_data_from_mt5(initialize, symbol, "5m")
-    open_ = df.iloc[-1]["Open"]
     time_frame = {'30m':0.5,'1h': 1,'1.5h': 1.5, '2h': 2, '2.5h': 2.5, '3h': 3, '3.5h': 3.5, '4h': 4,
                   '0.5':0.5, '1': 1, "1.5": 1.5, '2': 2, "2.5": 2.5, "3": 3, "3.5": 3.5, "4": 4}
     
     positions = []
     for symbol, timeframe in zip(symbols, timeframes):
+        df = get_data_from_mt5(initialize, symbol, "5m")
+        open_ = df.iloc[-1]["Open"]
         positions.append(strategy(df= calc_df, symbol= symbol, news=news,
                             open_= open_, time_open=time_open,
                             multiplier=get_tick_size(symbol), timeframe=time_frame[timeframe], risk=risk))
