@@ -112,7 +112,6 @@ def get_extra_points(df: pd.DataFrame, symbol: str, news: str, timeframe: int,
         # log(type(profit), profit)
 
         entry_point = price_calc(open_, function_over_price(price_mean), multiplier)
-        print(f"pip {function_over_price(price_mean)}  , open {open_}, mul {multiplier}")
         # log(type(entry_point), entry_point)
         positions[position] = {'News': news, "Action": position.upper(),
                                "Currency": symbol,
@@ -172,7 +171,7 @@ def trade_on_news(initialize, news, country, risk, time_open, symbol=None, timef
 
     if timeframe == None or symbol == None:
         interest_rows = calc_df[calc_df['News'].str.contains(news, regex=False)]
-        interest_rows.sort_values(by=['Win Rate'], ascending = False, inplace=True)
+        interest_rows.sort_values(by=['Win Rate', "Last 12 Profit"], ascending = False, inplace=True)
         symbol = interest_rows["Symbol"].iloc[0]
         timeframe = interest_rows["News"].iloc[0].split("_")[-1]
         log(f"best symbol and timeframe by winrate: {symbol} and {timeframe}")
@@ -192,11 +191,11 @@ def trade_i_positions_on_news(initialize, news, country, risk, time_open, num_po
     calc_df = open_calc(path='static/MinMax Strategy Back Test.xlsx', sheetname=country)
 
     interest_rows = calc_df[calc_df['News'].str.contains(news, regex=False)]
-    interest_rows.sort_values(by=['Win Rate'], ascending = False, inplace=True)
+    interest_rows.sort_values(by=['Win Rate', "Last 12 Profit"], ascending = False, inplace=True)
     symbols = [interest_rows["Symbol"].iloc[i] for i in range(num_positions)]
     timeframes = [interest_rows["News"].iloc[i].split("_")[-1] for i in range(num_positions)]
     winrates = [interest_rows["Win Rate"].iloc[i] for i in range(num_positions)]
-    log(f"best symbol and timeframe by winrate: {symbols} and {timeframes}")
+    log(f"best symbol and timeframe by winrate: {symbols} in {timeframes} with {winrates}")
 
     time_frame = {'30m':0.5,'1h': 1,'1.5h': 1.5, '2h': 2, '2.5h': 2.5, '3h': 3, '3.5h': 3.5, '4h': 4,
                   '0.5':0.5, '1': 1, "1.5": 1.5, '2': 2, "2.5": 2.5, "3": 3, "3.5": 3.5, "4": 4}
