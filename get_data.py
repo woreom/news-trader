@@ -215,6 +215,9 @@ def convert_to_gmt(requested_time):
 def get_today_calendar(countries: List, timezone):
     
     now = datetime.now(timezone)
+    file_path=now.date().strftime("%Y-%m-%d")+".xlsx"
+    if os.path.exists(file_path):
+        return pd.read_excel(file_path)
     gmt_format = convert_to_gmt(now)
 
     # countries = ["United States", "Australia","Japan", "Euro Zone", "Germany", 
@@ -227,6 +230,8 @@ def get_today_calendar(countries: List, timezone):
                                         )
     
     df = fix_dataframe(tf=df)
+    # print(df)
+    df.to_excel(now.date().strftime("%Y-%m-%d")+".xlsx",index=False)
     return df
 
 def make_folder(path):
