@@ -144,11 +144,13 @@ def calc_position_size(symbol, entry, sl, risk):
 def strategy(df: pd.DataFrame, symbol: str, news: str, open_: float,
              time_open: pd.DatetimeIndex, multiplier: float, timeframe: float= 4, risk: int= 100):
 
+    time_frame = {0.5: '30m', 1.0: '1h', 1.5: '1.5h', 2.0: '2h', 2.5: '2.5h', 3.0: '3h', 3.5: '3.5h', 4.0: '4h'}
     # log(timeframe, end=" : ")
     positions = get_extra_points(df=df, symbol=symbol, news=news,
                                       timeframe=timeframe, open_=open_, time_open=time_open, multiplier=multiplier)
     # log()
     info = [{"News": positions['buy']["News"], "Action": "Buy", "Currency": symbol, "EntryPoint": positions['buy']["EntryPoint"],
+            "TimeFrame": time_frame[timeframe],
             "TakeProfit": positions['buy']["TakeProfit"], "StepLoss": positions['buy']["StepLoss"], 
             "EntryTime": (positions['buy']["EntryTime"] + timedelta(minutes=10)).strftime("%d/%m/%Y %H:%M:%S"),
             "PendingTime": int((positions['buy']["EntryTime"] - time_open).total_seconds()),
