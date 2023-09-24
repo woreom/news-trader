@@ -1,4 +1,5 @@
 from time import sleep
+import requests
 from turtle import pos
 import pandas as pd
 from datetime import datetime, timedelta
@@ -12,47 +13,59 @@ from news_trading import trade_on_news, trade_i_positions_on_news
 from utils import log
 
 def news_trader(initialize, countries, symbol, timeframe, risk, timezone, num_positions=3):
-    news_time = False
-    positions = ()
-    now = pd.Timestamp('today', tzinfo=timezone).replace(tzinfo=None)
-    df = get_today_calendar(countries=countries, timezone=timezone)
-    
-    # get df from now
-    next_news = df[df["Date_Time"] > now].iloc[0]
-    news_index = df[df["Date_Time"] > now].index[0]
-    
-    # if it's 5min before new, place position
-    diff_now_next_news = datetime.strptime(str(next_news["Date_Time"]), "%Y-%m-%d %H:%M:%S") - now.replace(tzinfo=None)
-    diff_now_last_news = now.replace(tzinfo=None) - datetime.strptime(str(df["Date_Time"].iloc[news_index-1]), "%Y-%m-%d %H:%M:%S")
-
-    if timedelta(minutes=0) <= diff_now_next_news <= timedelta(minutes=5):
-        news_time = True
-        log(f"country={next_news['Country']}, news={next_news['News']}, symbol= {symbol}, timeframe={timeframe}")
-        
-        # positions = trade_on_news(initialize=initialize,
-        #                           country=next_news['Country'], news=next_news['News'],
-        #                           symbol= symbol, timeframe=timeframe, risk=risk, time_open=now)
-        
-        positions = trade_i_positions_on_news(initialize=initialize,
-                                  country=next_news['Country'], news=next_news['News'],
-                                  num_positions= num_positions, risk=risk, time_open=now)
-        
-        for position in positions:
-            Control_Position(initialize,  position[0], max_pending_time=position[0]['PendingTime'],
-                            max_open_time=4*60*60)
-            Control_Position(initialize,  position[1], max_pending_time=position[1]['PendingTime'],
-                            max_open_time=4*60*60)
-    
-    # if it's news is published to 4hour return true
-    # if timedelta(minutes=0) <= diff_now_last_news <= timedelta(hours=4):
-    #     news_time = True
-    # elif timedelta(minutes=0) <= diff_now_next_news <= timedelta(minutes=21):
-    #     news_time = True
-    else:
+    try:
         news_time = False
+        positions = ()
+        now = pd.Timestamp('today', tzinfo=timezone).replace(tzinfo=None)
+        df = get_today_calendar(countries=countries, timezone=timezone)
         
-    # else return false
-    return (news_time, positions)
+        # get df from now
+        next_news = df[df["Date_Time"] > now].iloc[0]
+        news_index = df[df["Date_Time"] > now].index[0]
+        
+        # if it's 5min before new, place position
+        diff_now_next_news = datetime.strptime(str(next_news["Date_Time"]), "%Y-%m-%d %H:%M:%S") - now.replace(tzinfo=None)
+        diff_now_last_news = now.replace(tzinfo=None) - datetime.strptime(str(df["Date_Time"].iloc[news_index-1]), "%Y-%m-%d %H:%M:%S")
+
+        if timedelta(minutes=0) <= diff_now_next_news <= timedelta(minutes=5):
+            news_time = True
+            log(f"country={next_news['Country']}, news={next_news['News']}, symbol= {symbol}, timeframe={timeframe}")
+            
+            # positions = trade_on_news(initialize=initialize,
+            #                           country=next_news['Country'], news=next_news['News'],
+            #                           symbol= symbol, timeframe=timeframe, risk=risk, time_open=now)
+            
+            positions = trade_i_positions_on_news(initialize=initialize,
+                                    country=next_news['Country'], news=next_news['News'],
+                                    num_positions= num_positions, risk=risk, time_open=now)
+            
+            for position in positions:
+                Control_Position(initialize,  position[0], max_pending_time=position[0]['PendingTime'],
+                                max_open_time=4*60*60)
+                Control_Position(initialize,  position[1], max_pending_time=position[1]['PendingTime'],
+                                max_open_time=4*60*60)
+        
+        # if it's news is published to 4hour return true
+        # if timedelta(minutes=0) <= diff_now_last_news <= timedelta(hours=4):
+        #     news_time = True
+        # elif timedelta(minutes=0) <= diff_now_next_news <= timedelta(minutes=21):
+        #     news_time = True
+        else:
+            news_time = False
+            
+        # else return false
+        return (news_time, positions)
+    
+    except AttributeError as e:
+        if str(e) == "'NoneType' object has no attribute 'time'":
+            return None
+        else:
+            raise
+    except requests.exceptions.JSONDecodeError as e:
+        if str(e) == "Expecting value: line 1 column 1 (char 0)":
+            return None
+        else:
+            raise
 
 def is_market_open():
     mt5.initialize()
