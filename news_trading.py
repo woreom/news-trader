@@ -194,6 +194,7 @@ def trade_i_positions_on_news(initialize, news, country, risk, time_open, num_po
 
     interest_rows = calc_df[calc_df['News'].str.contains(news, regex=False)]
     interest_rows.sort_values(by=['Win Rate', "Last 12 Profit"], ascending = False, inplace=True)
+    interest_rows.drop_duplicates(subset=["Symbol"], keep='first', inplace=True)
     symbols = [interest_rows["Symbol"].iloc[i] for i in range(num_positions)]
     timeframes = [interest_rows["News"].iloc[i].split("_")[-1] for i in range(num_positions)]
     winrates = [interest_rows["Win Rate"].iloc[i] for i in range(num_positions)]
