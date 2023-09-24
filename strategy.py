@@ -86,52 +86,21 @@ def Open_Position(trade_info):
     action = trade_info['Action']
     lot = np.double(trade_info['PositionSize'])
 
-
-    # Calculate the minimum distance between the entry price and take profit
-    min_distance = np.abs(tp - entry) / 3
-
-    # Get the current bid/ask price depending on the trade action
-    if action == "Sell":
-        price = mt5.symbol_info_tick(symbol).ask
-    else:
-        price = mt5.symbol_info_tick(symbol).bid
-
-    # Check if the current price is within the minimum distance of the entry price
-    # price < entry + min_distance and price > entry -min_distance
-    if False:
+    order_type = {"Buy": mt5.ORDER_TYPE_BUY_LIMIT, "Sell": mt5.ORDER_TYPE_SELL_LIMIT}
         
-        # Create a market order
-        order_type = {'Buy': mt5.ORDER_TYPE_BUY, 'Sell': mt5.ORDER_TYPE_SELL}
-        request = {
-            "action": mt5.TRADE_ACTION_DEAL,
-            "symbol": symbol,
-            "volume": lot,
-            "type": order_type[action],
-            "price": price,
-            "sl": sl,  
-            "tp": tp
-        }
-        
-    else:
-        # Create a pending order
-        if price > entry + min_distance:
-            order_type = {"Buy": mt5.ORDER_TYPE_BUY_LIMIT, "Sell": mt5.ORDER_TYPE_SELL_STOP}
-        else:
-            order_type = {"Buy": mt5.ORDER_TYPE_BUY_STOP, "Sell": mt5.ORDER_TYPE_SELL_LIMIT}
-            
-        request = {
-            "action": mt5.TRADE_ACTION_PENDING,
-            "symbol": symbol,
-            "volume": lot,
-            "type": order_type[action],
-            "price": entry,
-            "sl": sl,  
-            "tp": tp,
-            "type_filling":mt5.ORDER_FILLING_IOC,
-            "comment": trade_info['News'],
+    request = {
+        "action": mt5.TRADE_ACTION_PENDING,
+        "symbol": symbol,
+        "volume": lot,
+        "type": order_type[action],
+        "price": entry,
+        "sl": sl,  
+        "tp": tp,
+        "type_filling":mt5.ORDER_FILLING_IOC,
+        "comment": f"News: {trade_info['News']},Timeframe: {trade_info['TimeFrame']}, WinRate: {trade_info['WinRate']}, Estimated Entry Time: {trade_info['EntryTime']}",
 
-        }
-        
+    }
+    
     # Send the pending order to the trading server
     trade = mt5.order_send(request)
     log(trade)
