@@ -1,5 +1,6 @@
 from time import sleep
 import requests
+import traceback
 from turtle import pos
 import pandas as pd
 from datetime import datetime, timedelta
@@ -58,11 +59,13 @@ def news_trader(initialize, countries, symbol, timeframe, risk, timezone, num_po
     
     except AttributeError as e:
         if str(e) == "'NoneType' object has no attribute 'time'":
+            log(f"An exception occurred:\n{traceback.format_exc()}")
             return None
         else:
             raise
     except requests.exceptions.JSONDecodeError as e:
         if str(e) == "Expecting value: line 1 column 1 (char 0)":
+            log(f"An exception occurred:\n{traceback.format_exc()}")
             return None
         else:
             raise
