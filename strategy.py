@@ -97,7 +97,7 @@ def Open_Position(trade_info):
         "sl": sl,  
         "tp": tp,
         "type_filling":mt5.ORDER_FILLING_IOC,
-        "comment": f"News: {trade_info['News']},Timeframe: {trade_info['TimeFrame']}, Estimated Entry Time: {trade_info['EntryTime']}",
+        "comment": f"News: {trade_info['News']},Timeframe: {trade_info['TimeFrame']}, WinRate: {trade_info['WinRate']}, Estimated Entry Time: {trade_info['EntryTime']}",
 
     }
     
