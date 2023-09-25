@@ -156,6 +156,25 @@ if __name__ == "__main__":
     #                     multiplier=get_tick_size(symbol), timeframe=time_frame[timeframe], risk=risk)
     # log(positions)
 
+    ############## Test Multiplier Values ##############
+    # import MetaTrader5 as mt5
+    # from news_trading import get_tick_size
+    # __MULTIPLIER__VALUE__ = { 
+    #                     'AUDJPY': 0.1, 'AUDUSD': 0.00001, 'AUDCAD':0.001, 'AUDCHF': 0.001,
+    #                     'CADCHF': 0.001, 'CADJPY': 0.1, 'CHFJPY': 0.1, 'GBPCHF': 0.001,
+    #                     'EURAUD': 0.001, 'EURCAD': 0.001, 'EURGBP': 0.00001,
+    #                     'EURJPY': 0.1, 'EURNZD': 0.001, 'EURUSD': 0.00001, 'EURCHF': 0.001, 
+    #                     'GBPAUD': 0.001 , 'GBPJPY': 0.1, 'GBPUSD':0.00001, 'GBPCAD': 0.001,
+    #                     'GBPNZD': 0.001, 
+    #                     'NZDCAD': 0.001, 'NZDCHF': 0.001, 'NZDJPY': 0.1, 'NZDUSD': 0.001,
+    #                     'USDCAD': 0.001, 'USDCHF': 0.001, 'USDJPY': 0.1,
+    #                     'XAUUSD': 0.01, 
+    #                     }
+    # mt5.initialize()
+    # # mt5.login(login="51545562", password="zop7gsit", 
+    # #           server="Alpari-MT5-Demo")
+    # new_mult = {symbol:get_tick_size(symbol) for symbol in __MULTIPLIER__VALUE__.keys()}    
+    # print(new_mult)
     ##### Run the bot for a day #####
     run_bot(all_countries=['United States', 'United Kingdom', 'Euro Zone',
                            'Germany', 'Switzerland', 'Canada', 
