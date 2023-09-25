@@ -13,17 +13,14 @@ from utils import log
 __SHEET__NAME__={"USD":"United States", "JPY":"Japan", "EUR":"Euro Zone", "GER":"Germany", "GBP":"United Kingdom",
  "NZD":"New Zealand", "CAD":"Canada", "CHF":"Switzerland",}
 
-__MULTIPLIER__VALUE__ = { 
-                        'AUDJPY': 0.1, 'AUDUSD': 0.00001, 'AUDCAD':0.001, 'AUDCHF': 0.001,
-                        'CADCHF': 0.001, 'CADJPY': 0.1, 'CHFJPY': 0.1, 'GBPCHF': 0.001,
-                        'EURAUD': 0.001, 'EURCAD': 0.001, 'EURGBP': 0.00001,
-                        'EURJPY': 0.1, 'EURNZD': 0.001, 'EURUSD': 0.00001, 'EURCHF': 0.001, 
-                        'GBPAUD': 0.001 , 'GBPJPY': 0.1, 'GBPUSD':0.00001, 'GBPCAD': 0.001,
-                        'GBPNZD': 0.001, 
-                        'NZDCAD': 0.001, 'NZDCHF': 0.001, 'NZDJPY': 0.1, 'NZDUSD': 0.001,
-                        'USDCAD': 0.001, 'USDCHF': 0.001, 'USDJPY': 0.1,
-                        'XAUUSD': 0.01, 
-                        }
+__MULTIPLIER__VALUE__ = {
+    'AUDJPY': 0.001, 'AUDUSD': 1e-05, 'AUDCAD': 1e-05, 'AUDCHF': 1e-05, 'CADCHF': 1e-05,
+    'CADJPY': 0.001, 'CHFJPY': 0.001, 'GBPCHF': 1e-05, 'EURAUD': 1e-05, 'EURCAD': 1e-05,
+    'EURGBP': 1e-05, 'EURJPY': 0.001, 'EURNZD': 1e-05, 'EURUSD': 1e-05, 'EURCHF': 1e-05,
+    'GBPAUD': 1e-05, 'GBPJPY': 0.001, 'GBPUSD': 1e-05, 'GBPCAD': 1e-05, 'GBPNZD': 1e-05,
+    'NZDCAD': 1e-05, 'NZDCHF': 1e-05, 'NZDJPY': 0.001, 'NZDUSD': 1e-05, 'USDCAD': 1e-05,
+    'USDCHF': 1e-05, 'USDJPY': 0.001, 'XAUUSD': 0.01
+    }
 
 
 def get_tick_size(symbol: str) -> float:
