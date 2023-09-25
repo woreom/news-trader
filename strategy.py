@@ -97,13 +97,13 @@ def Open_Position(trade_info):
         "sl": sl,  
         "tp": tp,
         "type_filling":mt5.ORDER_FILLING_IOC,
-        "comment": f"News: {trade_info['News']},Timeframe: {trade_info['TimeFrame']}, WinRate: {trade_info['WinRate']}, Estimated Entry Time: {trade_info['EntryTime']}",
+        "comment": f"{trade_info['News'][:8]},{trade_info['TimeFrame']},{int(trade_info['WinRate']*100)}",
 
     }
     
     # Send the pending order to the trading server
     trade = mt5.order_send(request)
-    log(trade)
+    log(f'opend position: {trade.order}')
     # Return information about the trade order
     return trade, request
 
@@ -126,8 +126,8 @@ def Close_Position(trade_order, request, action, symbol, sleep_time):
     if action=='Remove':
         if mt5.order_check(request).profit==np.double(0):
             result=mt5.order_send({"order": trade_order, "action": mt5.TRADE_ACTION_REMOVE})
-        else: result=None
-    log(result)
+        else: result={'order': None}
+    log(f'closed position: {trade_order}')
     return result
 
 
@@ -153,12 +153,13 @@ def Control_Position(initialize,  trade_info, max_pending_time=2*60, max_open_ti
     trade, request=Open_Position(trade_info)
     
     if request["action"]==mt5.TRADE_ACTION_PENDING:
-        log(f"The Trade {trade} is pending for {max_pending_time}\nMore Info:\n{request}")
+        log(f"Order {trade.order} is pending for {max_pending_time}")
         t1 = threading.Thread(target=Close_Position, args=(trade.order, request, 'Remove', trade_info['Currency'], max_pending_time))
         t1.start()
     
     t1 = threading.Thread(target=Close_Position, args=(trade.order, request,'Close', trade_info['Currency'], max_open_time))
     t1.start()
+    return trade.order
     
 
 

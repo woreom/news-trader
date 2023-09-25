@@ -1,4 +1,6 @@
 from time import sleep
+import requests
+import traceback
 from turtle import pos
 import pandas as pd
 from datetime import datetime, timedelta
@@ -12,47 +14,60 @@ from news_trading import trade_on_news, trade_i_positions_on_news
 from utils import log
 
 def news_trader(initialize, countries, symbol, timeframe, risk, timezone, num_positions=3):
-    news_time = False
-    positions = ()
-    now = pd.Timestamp('today', tzinfo=timezone).replace(tzinfo=None)
-    df = get_today_calendar(countries=countries, timezone=timezone)
-    
-    # get df from now
-    next_news = df[df["Date_Time"] > now].iloc[0]
-    news_index = df[df["Date_Time"] > now].index[0]
-    
-    # if it's 5min before new, place position
-    diff_now_next_news = datetime.strptime(str(next_news["Date_Time"]), "%Y-%m-%d %H:%M:%S") - now.replace(tzinfo=None)
-    diff_now_last_news = now.replace(tzinfo=None) - datetime.strptime(str(df["Date_Time"].iloc[news_index-1]), "%Y-%m-%d %H:%M:%S")
-
-    if timedelta(minutes=0) <= diff_now_next_news <= timedelta(minutes=5):
-        news_time = True
-        log(f"country={next_news['Country']}, news={next_news['News']}, symbol= {symbol}, timeframe={timeframe}")
-        
-        # positions = trade_on_news(initialize=initialize,
-        #                           country=next_news['Country'], news=next_news['News'],
-        #                           symbol= symbol, timeframe=timeframe, risk=risk, time_open=now)
-        
-        positions = trade_i_positions_on_news(initialize=initialize,
-                                  country=next_news['Country'], news=next_news['News'],
-                                  num_positions= num_positions, risk=risk, time_open=now)
-        
-        for position in positions:
-            Control_Position(initialize,  position[0], max_pending_time=position[0]['PendingTime'],
-                            max_open_time=4*60*60)
-            Control_Position(initialize,  position[1], max_pending_time=position[1]['PendingTime'],
-                            max_open_time=4*60*60)
-    
-    # if it's news is published to 4hour return true
-    # if timedelta(minutes=0) <= diff_now_last_news <= timedelta(hours=4):
-    #     news_time = True
-    # elif timedelta(minutes=0) <= diff_now_next_news <= timedelta(minutes=21):
-    #     news_time = True
-    else:
+    try:
         news_time = False
+        positions = ()
+        now = pd.Timestamp('today', tzinfo=timezone).replace(tzinfo=None)
+        df = get_today_calendar(countries=countries, timezone=timezone)
         
-    # else return false
-    return (news_time, positions)
+        # get df from now
+        next_news = df[df["Date_Time"] > now].iloc[0]
+        news_index = df[df["Date_Time"] > now].index[0]
+        
+        # if it's 5min before new, place position
+        diff_now_next_news = datetime.strptime(str(next_news["Date_Time"]), "%Y-%m-%d %H:%M:%S") - now.replace(tzinfo=None)
+        diff_now_last_news = now.replace(tzinfo=None) - datetime.strptime(str(df["Date_Time"].iloc[news_index-1]), "%Y-%m-%d %H:%M:%S")
+
+        if timedelta(minutes=0) <= diff_now_next_news <= timedelta(minutes=5):
+            news_time = True
+            
+            # positions = trade_on_news(initialize=initialize,
+            #                           country=next_news['Country'], news=next_news['News'],
+            #                           symbol= symbol, timeframe=timeframe, risk=risk, time_open=now)
+            
+            positions = trade_i_positions_on_news(initialize=initialize,
+                                    country=next_news['Country'], news=next_news['News'],
+                                    num_positions= num_positions, risk=risk, time_open=now)
+            
+            for position in positions:
+                position[0]['order'] = Control_Position(initialize,  position[0], max_pending_time=position[0]['PendingTime'],
+                                max_open_time=4*60*60)
+                position[1]['order'] = Control_Position(initialize,  position[1], max_pending_time=position[1]['PendingTime'],
+                                max_open_time=4*60*60)
+        
+        # if it's news is published to 4hour return true
+        # if timedelta(minutes=0) <= diff_now_last_news <= timedelta(hours=4):
+        #     news_time = True
+        # elif timedelta(minutes=0) <= diff_now_next_news <= timedelta(minutes=21):
+        #     news_time = True
+        else:
+            news_time = False
+            
+        # else return false
+        return (news_time, positions)
+    
+    except AttributeError as e:
+        if str(e) == "'NoneType' object has no attribute 'time'":
+            log(f"An exception occurred:\n{traceback.format_exc()}")
+            return None
+        else:
+            raise
+    except requests.exceptions.JSONDecodeError as e:
+        if str(e) == "Expecting value: line 1 column 1 (char 0)":
+            log(f"An exception occurred:\n{traceback.format_exc()}")
+            return None
+        else:
+            raise
 
 def is_market_open():
     mt5.initialize()
@@ -88,7 +103,10 @@ def run_bot(all_countries=['United States'], symbol=None, timeframe=None, risk=1
                 timezone= timezone,
                 num_positions= num_positions)
         # if positions != (): log(flag, positions)
-        log(flag, positions)
+        log(f"News Time? {'Yes' if flag else 'No'}")
+        for position in positions:
+            log(f'{{order: {position[0]["order"]}, News: {position[0]["News"]}, TimeFrame: {position[0]["TimeFrame"]}, Currency: {position[0]["Currency"]}, Action: {position[0]["Action"]}, WinRate: {position[0]["WinRate"]}, RR: {position[0]["RR"]}, PositionSize: {position[0]["PositionSize"]}, EntryPoint: {position[0]["EntryPoint"]}, TakeProfit: {position[0]["TakeProfit"]}, StepLoss: {position[0]["StepLoss"]}, EntryTime: {position[0]["EntryTime"]}, PendingTime: {position[0]["PendingTime"]}, Risk: {position[0]["Risk"]}}}')
+            log(f'{{order: {position[1]["order"]}, News: {position[1]["News"]}, TimeFrame: {position[1]["TimeFrame"]}, Currency: {position[1]["Currency"]}, Action: {position[1]["Action"]}, WinRate: {position[1]["WinRate"]}, RR: {position[1]["RR"]}, PositionSize: {position[1]["PositionSize"]}, EntryPoint: {position[1]["EntryPoint"]}, TakeProfit: {position[1]["TakeProfit"]}, StepLoss: {position[1]["StepLoss"]}, EntryTime: {position[1]["EntryTime"]}, PendingTime: {position[1]["PendingTime"]}, Risk: {position[1]["Risk"]}}}')
         sleep(30)
         if flag: sleep(5*60)  
 
