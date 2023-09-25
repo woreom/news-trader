@@ -150,7 +150,7 @@ def strategy(df: pd.DataFrame, symbol: str, news: str, open_: float,
                                       timeframe=timeframe, open_=open_, time_open=time_open, multiplier=multiplier)
     # log()
     info = [{"News": positions['buy']["News"], "Action": "Buy", "Currency": symbol, "EntryPoint": positions['buy']["EntryPoint"],
-            "TimeFrame": time_frame[timeframe],
+            "TimeFrame": timeframe,
             "TakeProfit": positions['buy']["TakeProfit"], "StepLoss": positions['buy']["StepLoss"], 
             "EntryTime": (positions['buy']["EntryTime"] + timedelta(minutes=10)).strftime("%d/%m/%Y %H:%M:%S"),
             "PendingTime": int((positions['buy']["EntryTime"] - time_open).total_seconds()),
@@ -159,6 +159,7 @@ def strategy(df: pd.DataFrame, symbol: str, news: str, open_: float,
             'Risk':risk},
             {"News": positions['sell']["News"], "Action": "Sell", "Currency": symbol, "EntryPoint": positions['sell']["EntryPoint"],
             "TakeProfit": positions['sell']["TakeProfit"], "StepLoss": positions['sell']["StepLoss"], 
+            "TimeFrame": timeframe,
             "EntryTime": (positions['sell']["EntryTime"] + timedelta(minutes=10)).strftime("%d/%m/%Y %H:%M:%S"),
             "PendingTime": int((positions['sell']["EntryTime"] - time_open).total_seconds()),
             'RR': np.abs((positions['sell']["TakeProfit"] - positions['sell']["EntryPoint"]) / (positions['sell']["StepLoss"] - positions['sell']["EntryPoint"])),
@@ -198,7 +199,7 @@ def trade_i_positions_on_news(initialize, news, country, risk, time_open, num_po
     symbols = [interest_rows["Symbol"].iloc[i] for i in range(num_positions)]
     timeframes = [interest_rows["News"].iloc[i].split("_")[-1] for i in range(num_positions)]
     winrates = [interest_rows["Win Rate"].iloc[i] for i in range(num_positions)]
-    log(f"best symbol and timeframe by winrate: {symbols} in {timeframes} with {winrates}")
+    log(f"country={country}, news={news}, symbol= {symbols}, timeframe={timeframes} with {winrates}")
 
     time_frame = {'30m':0.5,'1h': 1,'1.5h': 1.5, '2h': 2, '2.5h': 2.5, '3h': 3, '3.5h': 3.5, '4h': 4,
                   '0.5':0.5, '1': 1, "1.5": 1.5, '2': 2, "2.5": 2.5, "3": 3, "3.5": 3.5, "4": 4}

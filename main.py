@@ -30,7 +30,6 @@ def news_trader(initialize, countries, symbol, timeframe, risk, timezone, num_po
 
         if timedelta(minutes=0) <= diff_now_next_news <= timedelta(minutes=5):
             news_time = True
-            log(f"country={next_news['Country']}, news={next_news['News']}, symbol= {symbol}, timeframe={timeframe}")
             
             # positions = trade_on_news(initialize=initialize,
             #                           country=next_news['Country'], news=next_news['News'],
@@ -41,9 +40,9 @@ def news_trader(initialize, countries, symbol, timeframe, risk, timezone, num_po
                                     num_positions= num_positions, risk=risk, time_open=now)
             
             for position in positions:
-                Control_Position(initialize,  position[0], max_pending_time=position[0]['PendingTime'],
+                position[0]['order'] = Control_Position(initialize,  position[0], max_pending_time=position[0]['PendingTime'],
                                 max_open_time=4*60*60)
-                Control_Position(initialize,  position[1], max_pending_time=position[1]['PendingTime'],
+                position[1]['order'] = Control_Position(initialize,  position[1], max_pending_time=position[1]['PendingTime'],
                                 max_open_time=4*60*60)
         
         # if it's news is published to 4hour return true
@@ -104,7 +103,10 @@ def run_bot(all_countries=['United States'], symbol=None, timeframe=None, risk=1
                 timezone= timezone,
                 num_positions= num_positions)
         # if positions != (): log(flag, positions)
-        log(flag, positions)
+        log(f"News Time? {'Yes' if flag else 'No'}")
+        for position in positions:
+            log(f'{{order: {position[0]["order"]}, News: {position[0]["News"]}, TimeFrame: {position[0]["TimeFrame"]}, Currency: {position[0]["Currency"]}, Action: {position[0]["Action"]}, WinRate: {position[0]["WinRate"]}, RR: {position[0]["RR"]}, PositionSize: {position[0]["PositionSize"]}, EntryPoint: {position[0]["EntryPoint"]}, TakeProfit: {position[0]["TakeProfit"]}, StepLoss: {position[0]["StepLoss"]}, EntryTime: {position[0]["EntryTime"]}, PendingTime: {position[0]["PendingTime"]}, Risk: {position[0]["Risk"]}}}')
+            log(f'{{order: {position[1]["order"]}, News: {position[1]["News"]}, TimeFrame: {position[1]["TimeFrame"]}, Currency: {position[1]["Currency"]}, Action: {position[1]["Action"]}, WinRate: {position[1]["WinRate"]}, RR: {position[1]["RR"]}, PositionSize: {position[1]["PositionSize"]}, EntryPoint: {position[1]["EntryPoint"]}, TakeProfit: {position[1]["TakeProfit"]}, StepLoss: {position[1]["StepLoss"]}, EntryTime: {position[1]["EntryTime"]}, PendingTime: {position[1]["PendingTime"]}, Risk: {position[1]["Risk"]}}}')
         sleep(30)
         if flag: sleep(5*60)  
 
