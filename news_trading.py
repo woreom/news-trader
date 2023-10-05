@@ -44,6 +44,7 @@ def get_tick_size(symbol: str) -> float:
 
     tick_size = symbol_info.trade_tick_size
     return tick_size
+
 def open_calc(path: str= "static/calc.xlsx", sheetname: str= "United States"):
     calc = pd.read_excel(path, sheet_name=sheetname)
     return calc
