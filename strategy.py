@@ -97,8 +97,7 @@ def Open_Position(trade_info):
         "sl": sl,  
         "tp": tp,
         "type_filling":mt5.ORDER_FILLING_IOC,
-        "comment": f"{trade_info['News'][:8]},{trade_info['TimeFrame']},{int(trade_info['WinRate']*100)}",
-
+        "comment": f"{trade_info['News'][:3]},{trade_info['TimeFrame']},{round(trade_info['WinRate']*100, ndigits=2)}",
     }
     
     # Send the pending order to the trading server
@@ -119,17 +118,25 @@ def Close_Position(trade_order, request, action, symbol, sleep_time):
     sleep_time: int, the number of seconds to wait before executing the trade action
     
     """
-        
+
     sleep(sleep_time)
+    counter = 0
+    result = False
     if action=='Close':
-        result=mt5.Close(symbol=symbol,ticket=trade_order)
-    if action=='Remove':
-        if mt5.order_check(request).profit==np.double(0):
+        while not result and counter<=40:
+            result=mt5.Close(symbol=symbol,ticket=int(trade_order))
             result=mt5.order_send({"order": trade_order, "action": mt5.TRADE_ACTION_REMOVE})
-        else: result={'order': None}
+            sleep(10)
+            counter+=1
+    if action=='Remove':
+        while not result and counter<=40:
+            if mt5.order_check(request).profit==np.double(0):
+                result=mt5.order_send({"order": trade_order, "action": mt5.TRADE_ACTION_REMOVE})
+                result=mt5.Close(symbol=symbol,ticket=int(trade_order))
+                sleep(10)
+                counter+=1
     log(f'closed position: {trade_order}')
     return result
-
 
 def Control_Position(initialize,  trade_info, max_pending_time=2*60, max_open_time=20*60):
     
@@ -159,7 +166,7 @@ def Control_Position(initialize,  trade_info, max_pending_time=2*60, max_open_ti
     
     t1 = threading.Thread(target=Close_Position, args=(trade.order, request,'Close', trade_info['Currency'], max_open_time))
     t1.start()
-    return trade.order
+    # return trade.order
     
 
 
