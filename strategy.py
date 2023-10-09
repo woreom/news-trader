@@ -101,7 +101,15 @@ def Open_Position(trade_info):
     }
     
     # Send the pending order to the trading server
-    trade = mt5.order_send(request)
+    counter = 0
+    class dummy():
+        order=0
+    trade= dummy()
+    while trade.order == 0 and counter<=40:
+        trade = mt5.order_send(request)
+        # print(trade)
+        sleep(10)
+        counter+=1
     log(f'opend position: {trade.order}')
     # Return information about the trade order
     return trade, request
