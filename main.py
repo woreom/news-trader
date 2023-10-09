@@ -60,10 +60,19 @@ def news_trader(initialize, countries, symbol, timeframe, risk, timezone, num_po
         if str(e) == "'NoneType' object has no attribute 'time'":
             log(f"An exception occurred:\n{traceback.format_exc()}")
             return None
+        if str(e) == "'NoneType' object has no attribute 'profit'":
+            log(f"An exception occurred:\n{traceback.format_exc()}")
+            return None
         else:
             raise
     except requests.exceptions.JSONDecodeError as e:
         if str(e) == "Expecting value: line 1 column 1 (char 0)":
+            log(f"An exception occurred:\n{traceback.format_exc()}")
+            return None
+        else:
+            raise
+    except IndexError as e:
+        if str(e) == "single positional indexer is out-of-bounds":
             log(f"An exception occurred:\n{traceback.format_exc()}")
             return None
         else:
@@ -135,13 +144,13 @@ if __name__ == "__main__":
     #               country='United States', news='OPEC Crude Oil Production Guinea',
     #               symbol= None, timeframe=None, risk=100, time_open=0)
     
-    # ############ test a random news ##############
+    # # ############ test a random news ##############
     # from news_trading import open_calc, strategy, get_tick_size
     # from get_data import get_data_from_mt5
     # risk = 100
     # time_open = datetime.now()
-    # country='United States'
-    # news='Dallas Fed PCE'
+    # country='Euro Zone'
+    # news="ECB's Enria Speaks"
     # time_frame = {'30m':0.5,'1h': 1,'1.5h': 1.5, '2h': 2, '2.5h': 2.5, '3h': 3, '3.5h': 3.5, '4h': 4,
     #               '0.5':0.5, '1': 1, "1.5": 1.5, '2': 2, "2.5": 2.5, "3": 3, "3.5": 3.5, "4": 4}
     # calc_df = open_calc(path='static/MinMax Strategy Back Test.xlsx', sheetname=country)
@@ -190,10 +199,10 @@ if __name__ == "__main__":
     # new_mult = {symbol:get_tick_size(symbol) for symbol in __MULTIPLIER__VALUE__.keys()}    
     # print(new_mult)
     ##### Run the bot for a day #####
-    run_bot(all_countries=['United States', 'United Kingdom', 'Euro Zone',
-                           'Germany', 'Switzerland', 'Canada', 
-                           'Australia', 'Japan', 'New Zealand', 'China'],
-                           symbol=None, timeframe=None, risk=100, num_positions=3)
+    # run_bot(all_countries=['United States', 'United Kingdom', 'Euro Zone',
+    #                        'Germany', 'Switzerland', 'Canada', 
+    #                        'Australia', 'Japan', 'New Zealand', 'China'],
+    #                        symbol=None, timeframe=None, risk=100, num_positions=3)
 
     
 
