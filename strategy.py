@@ -108,7 +108,7 @@ def Open_Position(trade_info):
     while trade.order == 0 and counter<=40:
         trade = mt5.order_send(request)
         # print(trade)
-        sleep(10)
+        sleep(1)
         counter+=1
     log(f'opend position: {trade.order}')
     # Return information about the trade order
