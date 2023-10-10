@@ -59,22 +59,22 @@ def news_trader(initialize, countries, symbol, timeframe, risk, timezone, num_po
     except AttributeError as e:
         if str(e) == "'NoneType' object has no attribute 'time'":
             log(f"An exception occurred:\n{traceback.format_exc()}")
-            return None
+            return None, None
         if str(e) == "'NoneType' object has no attribute 'profit'":
             log(f"An exception occurred:\n{traceback.format_exc()}")
-            return None
+            return None, None
         else:
             raise
     except requests.exceptions.JSONDecodeError as e:
         if str(e) == "Expecting value: line 1 column 1 (char 0)":
             log(f"An exception occurred:\n{traceback.format_exc()}")
-            return None
+            return None, None
         else:
             raise
     except IndexError as e:
         if str(e) == "single positional indexer is out-of-bounds":
             log(f"An exception occurred:\n{traceback.format_exc()}")
-            return None
+            return None, None
         else:
             raise
 
@@ -113,15 +113,18 @@ def run_bot(all_countries=['United States'], symbol=None, timeframe=None, risk=1
                     timezone= timezone,
                     num_positions= num_positions)
             # if positions != (): log(flag, positions)
-            log(f"News Time? {'Yes' if flag else 'No'}")
-            for position in positions:
-                log(f'{{order: {position[0]["order"]}, News: {position[0]["News"]}, TimeFrame: {position[0]["TimeFrame"]}, Currency: {position[0]["Currency"]}, Action: {position[0]["Action"]}, WinRate: {position[0]["WinRate"]}, RR: {position[0]["RR"]}, PositionSize: {position[0]["PositionSize"]}, EntryPoint: {position[0]["EntryPoint"]}, TakeProfit: {position[0]["TakeProfit"]}, StepLoss: {position[0]["StepLoss"]}, EntryTime: {position[0]["EntryTime"]}, PendingTime: {position[0]["PendingTime"]}, Risk: {position[0]["Risk"]}}}')
-                log(f'{{order: {position[1]["order"]}, News: {position[1]["News"]}, TimeFrame: {position[1]["TimeFrame"]}, Currency: {position[1]["Currency"]}, Action: {position[1]["Action"]}, WinRate: {position[1]["WinRate"]}, RR: {position[1]["RR"]}, PositionSize: {position[1]["PositionSize"]}, EntryPoint: {position[1]["EntryPoint"]}, TakeProfit: {position[1]["TakeProfit"]}, StepLoss: {position[1]["StepLoss"]}, EntryTime: {position[1]["EntryTime"]}, PendingTime: {position[1]["PendingTime"]}, Risk: {position[1]["Risk"]}}}')
-            sleep(30)
-            if flag: sleep(5*60) 
+            if flag != None:    
+                log(f"News Time? {'Yes' if flag else 'No'}")
+                for position in positions:
+                    log(f'{{order: {position[0]["order"]}, News: {position[0]["News"]}, TimeFrame: {position[0]["TimeFrame"]}, Currency: {position[0]["Currency"]}, Action: {position[0]["Action"]}, WinRate: {position[0]["WinRate"]}, RR: {position[0]["RR"]}, PositionSize: {position[0]["PositionSize"]}, EntryPoint: {position[0]["EntryPoint"]}, TakeProfit: {position[0]["TakeProfit"]}, StepLoss: {position[0]["StepLoss"]}, EntryTime: {position[0]["EntryTime"]}, PendingTime: {position[0]["PendingTime"]}, Risk: {position[0]["Risk"]}}}')
+                    log(f'{{order: {position[1]["order"]}, News: {position[1]["News"]}, TimeFrame: {position[1]["TimeFrame"]}, Currency: {position[1]["Currency"]}, Action: {position[1]["Action"]}, WinRate: {position[1]["WinRate"]}, RR: {position[1]["RR"]}, PositionSize: {position[1]["PositionSize"]}, EntryPoint: {position[1]["EntryPoint"]}, TakeProfit: {position[1]["TakeProfit"]}, StepLoss: {position[1]["StepLoss"]}, EntryTime: {position[1]["EntryTime"]}, PendingTime: {position[1]["PendingTime"]}, Risk: {position[1]["Risk"]}}}')
+                sleep(30)
+                if flag: sleep(5*60)
+            else:
+                log(f"flag: {flag}, position:{position}")
     except KeyboardInterrupt:
         # quit
-        # mt5.shutdown()
+        mt5.shutdown()
         sys.exit()
 
     
@@ -149,16 +152,16 @@ if __name__ == "__main__":
     # from get_data import get_data_from_mt5
     # risk = 100
     # time_open = datetime.now()
-    # country='Euro Zone'
-    # news="ECB's Enria Speaks"
+    # country='United States'
+    # news="Fed Governor Jefferson"
     # time_frame = {'30m':0.5,'1h': 1,'1.5h': 1.5, '2h': 2, '2.5h': 2.5, '3h': 3, '3.5h': 3.5, '4h': 4,
-    #               '0.5':0.5, '1': 1, "1.5": 1.5, '2': 2, "2.5": 2.5, "3": 3, "3.5": 3.5, "4": 4}
+    #             '0.5':0.5, '1': 1, "1.5": 1.5, '2': 2, "2.5": 2.5, "3": 3, "3.5": 3.5, "4": 4}
     # calc_df = open_calc(path='static/MinMax Strategy Back Test.xlsx', sheetname=country)
     # # initialize = ["51545562", "zop7gsit", "Alpari-MT5-Demo"]
     # initialize = ["51852441", "scfenm8n", "Alpari-MT5-Demo"]
     # mt5.initialize()
     # mt5.login(login=initialize[0], password=initialize[1], 
-    #           server=initialize[2])
+    #         server=initialize[2])
 
     # interest_rows = calc_df[calc_df['News'].str.contains(news)]
     # interest_rows.sort_values(by=['Win Rate'], ascending = False, inplace=True)
@@ -173,13 +176,12 @@ if __name__ == "__main__":
     #                     multiplier=get_tick_size(symbol), timeframe=time_frame[timeframe], risk=risk)
     # log(positions)
     # positions[0]['order'] = Control_Position(initialize,  positions[0],
-    #                                          max_pending_time=positions[0]['PendingTime'],
-    #                                          max_open_time=3)
+    #                                         max_pending_time=positions[0]['PendingTime'],
+    #                                         max_open_time=3)
     # positions[1]['order'] = Control_Position(initialize,  positions[1], 
-    #                                          max_pending_time=positions[1]['PendingTime'],
-    #                                          max_open_time=3)
-
-    ############## Test Multiplier Values ##############
+    #                                         max_pending_time=positions[1]['PendingTime'],
+    #                                         max_open_time=3)
+    # ############## Test Multiplier Values ##############
     # import MetaTrader5 as mt5
     # from news_trading import get_tick_size
     # __MULTIPLIER__VALUE__ = { 
@@ -199,10 +201,10 @@ if __name__ == "__main__":
     # new_mult = {symbol:get_tick_size(symbol) for symbol in __MULTIPLIER__VALUE__.keys()}    
     # print(new_mult)
     ##### Run the bot for a day #####
-    # run_bot(all_countries=['United States', 'United Kingdom', 'Euro Zone',
-    #                        'Germany', 'Switzerland', 'Canada', 
-    #                        'Australia', 'Japan', 'New Zealand', 'China'],
-    #                        symbol=None, timeframe=None, risk=100, num_positions=3)
+    run_bot(all_countries=['United States', 'United Kingdom', 'Euro Zone',
+                           'Germany', 'Switzerland', 'Canada', 
+                           'Australia', 'Japan', 'New Zealand', 'China'],
+                           symbol=None, timeframe=None, risk=100, num_positions=3)
 
     
 
