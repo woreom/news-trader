@@ -12,8 +12,14 @@ import MetaTrader5 as mt5
 
 from utils import log
 
-## Download historical market data from MetaTrader5
+def get_price(initialize, symbol):
+    # Initialization
+    mt5.initialize()
+    mt5.login(login=initialize[0],password=initialize[1],server=initialize[2])
 
+    return {"buy": mt5.symbol_info_tick(symbol).ask, "sell": mt5.symbol_info_tick(symbol).bid}
+
+## Download historical market data from MetaTrader5
 def get_data_from_mt5(initialize, Ticker, TimeFrame):
     """
     Download historical market data from MetaTrader5.
