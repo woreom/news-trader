@@ -78,10 +78,10 @@ def news_trader(initialize, countries, symbol, timeframe, risk, timezone, num_po
         else:
             raise
 
-def is_market_open():
+def is_market_open(initialize):
     mt5.initialize()
-    mt5.login(login="51545562", password="zop7gsit", 
-              server="Alpari-MT5-Demo")
+    mt5.login(login=initialize[0], password=initialize[1],
+              server=initialize[2])
 
     # get the symbol you want to check
     symbol = "EURUSD"
@@ -100,12 +100,13 @@ def is_market_open():
 
 def run_bot(all_countries=['United States'], symbol=None, timeframe=None, risk=100, num_positions=3):
     try:
+        initialize= ["51810268", "apmjgjp1", "Alpari-MT5-Demo"]
         message = "Starting Bot ..."
         log(message)
         timezone = pytz.timezone('Asia/Tehran')
 
-        while is_market_open():
-            flag, positions = news_trader(initialize= ["51810268", "apmjgjp1", "Alpari-MT5-Demo"],
+        while is_market_open(initialize):
+            flag, positions = news_trader(initialize=initialize,
                     countries= all_countries,
                     symbol= symbol,
                     timeframe= timeframe,
