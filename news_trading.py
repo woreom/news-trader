@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 import MetaTrader5 as mt5
 
-from get_data import get_data_from_mt5
+from get_data import get_price
 from utils import log
 
 __SHEET__NAME__={"USD":"United States", "JPY":"Japan", "EUR":"Euro Zone", "GER":"Germany", "GBP":"United Kingdom",
@@ -109,13 +109,13 @@ def get_extra_points(df: pd.DataFrame, symbol: str, news: str, timeframe: int,
         profit = float(interest_row["Profit"].iloc[0])
         # log(type(profit), profit)
 
-        entry_point = price_calc(open_, function_over_price(price_mean), multiplier)
+        entry_point = price_calc(open_[position], function_over_price(price_mean), multiplier)
         # log(type(entry_point), entry_point)
         positions[position] = {'News': news, "Action": position.upper(),
                                "Currency": symbol,
                                "EntryPoint": entry_point,
                                "TakeProfit": price_calc(entry_point, function_over_price(-1*sign*profit/2), multiplier),
-                               "StepLoss": price_calc(open_, function_over_price(sign*profit/2), multiplier),
+                               "StepLoss": price_calc(open_[position], function_over_price(sign*profit/2), multiplier),
                                "EntryTime": (time_open + timedelta(minutes=time_mean)),
                                "WinRate": interest_row["Win Rate"].iloc[0]}
      
@@ -177,8 +177,7 @@ def trade_on_news(initialize, news, country, risk, time_open, symbol=None, timef
         timeframe = interest_rows["News"].iloc[0].split("_")[-1]
         log(f"best symbol and timeframe by winrate: {symbol} and {timeframe}")
 
-    df = get_data_from_mt5(initialize, symbol, "5m")
-    open_ = df.iloc[-1]["Open"]
+    open_ = get_price(initialize, symbol)
     time_frame = {'30m':0.5,'1h': 1,'1.5h': 1.5, '2h': 2, '2.5h': 2.5, '3h': 3, '3.5h': 3.5, '4h': 4,
                   '0.5':0.5, '1': 1, "1.5": 1.5, '2': 2, "2.5": 2.5, "3": 3, "3.5": 3.5, "4": 4}
     
@@ -204,8 +203,7 @@ def trade_i_positions_on_news(initialize, news, country, risk, time_open, num_po
     
     positions = []
     for symbol, timeframe in zip(symbols, timeframes):
-        df = get_data_from_mt5(initialize, symbol, "5m")
-        open_ = df.iloc[-1]["Open"]
+        open_ = get_price(initialize, symbol)
         positions.append(strategy(df= calc_df, symbol= symbol, news=news,
                             open_= open_, time_open=time_open,
                             multiplier=get_tick_size(symbol), timeframe=time_frame[timeframe], risk=risk))
