@@ -121,7 +121,7 @@ def run_bot(all_countries=['United States'], symbol=None, timeframe=None, risk=1
                 sleep(30)
                 if flag: sleep(5*60)
             else:
-                log(f"flag: {flag}, position:{position}")
+                log(f"flag: {flag}, position:{positions}")
     except KeyboardInterrupt:
         # quit
         mt5.shutdown()
