@@ -1,5 +1,8 @@
 ## Import Libraries
+import time
+import pytz
 from time import sleep
+from datetime import datetime, timedelta
 import threading
 
 import numpy as np
@@ -85,9 +88,12 @@ def Open_Position(trade_info):
     sl = np.round(trade_info['StepLoss'], digit)
     action = trade_info['Action']
     lot = np.double(trade_info['PositionSize'])
+    timezone = pytz.timezone('Etc/GMT+1')
+    # print((datetime.now(timezone) + timedelta(seconds=trade_info["PendingTime"])).timestamp())
+    expiration =  int(time.mktime((datetime.now(timezone) + timedelta(seconds=trade_info["PendingTime"])).timetuple()))
 
     order_type = {"Buy": mt5.ORDER_TYPE_BUY_LIMIT, "Sell": mt5.ORDER_TYPE_SELL_LIMIT}
-        
+    
     request = {
         "action": mt5.TRADE_ACTION_PENDING,
         "symbol": symbol,
@@ -96,6 +102,8 @@ def Open_Position(trade_info):
         "price": entry,
         "sl": sl,  
         "tp": tp,
+        "type_time": mt5.ORDER_TIME_SPECIFIED,
+        "expiration": expiration,
         "type_filling":mt5.ORDER_FILLING_IOC,
         "comment": f"{trade_info['News'][:3]},{trade_info['TimeFrame']},{round(trade_info['WinRate']*100, ndigits=2)}",
     }
@@ -107,8 +115,8 @@ def Open_Position(trade_info):
     trade= dummy()
     while trade.order == 0 and counter<=40:
         trade = mt5.order_send(request)
-        # print(trade)
-        sleep(1)
+        print(trade)
+        # sleep(1)
         counter+=1
     log(f'opend position: {trade.order}')
     # Return information about the trade order
