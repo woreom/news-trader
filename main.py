@@ -63,6 +63,12 @@ def news_trader(initialize, countries, symbol, timeframe, risk, timezone, num_po
         if str(e) == "'NoneType' object has no attribute 'profit'":
             log(f"An exception occurred:\n{traceback.format_exc()}")
             return None, None
+        if str(e) == "'NoneType' object has no attribute 'ask'":
+            log(f"An exception occurred:\n{traceback.format_exc()}")
+            return None, None
+        if str(e) == "'NoneType' object has no attribute 'bid'":
+            log(f"An exception occurred:\n{traceback.format_exc()}")
+            return None, None
         else:
             raise
     except requests.exceptions.JSONDecodeError as e:
