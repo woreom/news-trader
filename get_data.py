@@ -12,6 +12,14 @@ import MetaTrader5 as mt5
 
 from utils import log
 
+def current_time():
+    
+    df = pd.DataFrame(mt5.copy_rates_from_pos("EURUSD", mt5.TIMEFRAME_M1, 0, 10))
+
+    df['time']=pd.to_datetime(df['time'], unit='s')
+    
+    return df['time'].iloc[-1]
+
 def get_price(initialize, symbol):
     # Initialization
     mt5.initialize()
