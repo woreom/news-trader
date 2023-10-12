@@ -83,6 +83,10 @@ def news_trader(initialize, countries, symbol, timeframe, risk, timezone, num_po
             return None, None
         else:
             raise
+    except ConnectionError as e:
+        log(f"An exception occurred:\n{traceback.format_exc()}")
+        return None, None
+
 
 def is_market_open(initialize):
     mt5.initialize()
@@ -134,6 +138,13 @@ def run_bot(all_countries=['United States'], symbol=None, timeframe=None, risk=1
         mt5.shutdown()
         sys.exit()
 
+    except AttributeError as e:
+        if str(e) == "'NoneType' object has no attribute 'time'":
+            log(f"An exception occurred:\n{traceback.format_exc()}")
+            return run_bot(all_countries=all_countries, symbol=symbol,
+                           timeframe=timeframe, risk=risk,
+                           num_positions=num_positions)
+
     
        
 if __name__ == "__main__":
@@ -164,7 +175,7 @@ if __name__ == "__main__":
     # time_frame = {'30m':0.5,'1h': 1,'1.5h': 1.5, '2h': 2, '2.5h': 2.5, '3h': 3, '3.5h': 3.5, '4h': 4,
     #             '0.5':0.5, '1': 1, "1.5": 1.5, '2': 2, "2.5": 2.5, "3": 3, "3.5": 3.5, "4": 4}
     # calc_df = open_calc(path='static/MinMax Strategy Back Test.xlsx', sheetname=country)
-    # # initialize = ["51545562", "zop7gsit", "Alpari-MT5-Demo"]
+    # initialize = ["51545562", "zop7gsit", "Alpari-MT5-Demo"]
     # initialize = ["51852441", "scfenm8n", "Alpari-MT5-Demo"]
     # mt5.initialize()
     # mt5.login(login=initialize[0], password=initialize[1], server=initialize[2])
