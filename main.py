@@ -83,7 +83,7 @@ def news_trader(initialize, countries, symbol, timeframe, risk, timezone, num_po
             return None, None
         else:
             raise
-    except ConnectionError as e:
+    except requests.exceptions.ConnectionError as e:
         log(f"An exception occurred:\n{traceback.format_exc()}")
         return None, None
 
