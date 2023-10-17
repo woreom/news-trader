@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 import investpy
 import MetaTrader5 as mt5
+import time
 
 from utils import log
 
@@ -229,7 +230,11 @@ def convert_to_gmt(requested_time):
 def get_today_calendar(countries: List, timezone):
     
     now = datetime.now(timezone)
-    file_path=f'static/{now.date().strftime("%Y-%m-%d")}.xlsx'
+    print(now)
+    #file_path=f'static/{now.date().strftime("%m-%d-%Y_%H")}.xlsx'
+    file_path=f'static/{now.strftime("%Y-%m-%d_%H")}.xlsx'
+    
+    print(file_path)
     if os.path.exists(file_path):
         return pd.read_excel(file_path)
     gmt_format = convert_to_gmt(now)
@@ -245,8 +250,9 @@ def get_today_calendar(countries: List, timezone):
     
     df = fix_dataframe(tf=df)
     # print(df)
-    df.to_excel(f'static/{now.date().strftime("%Y-%m-%d")}.xlsx',index=False)
+    df.to_excel(f'static/{now.strftime("%Y-%m-%d_%H")}.xlsx',index=False)
     return df
+
 
 def make_folder(path):
     if not os.path.exists(path):
