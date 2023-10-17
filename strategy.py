@@ -115,7 +115,9 @@ def Open_Position(trade_info):
     trade= dummy()
     while trade.order == 0 and counter<=40:
         trade = mt5.order_send(request)
-        # print(trade)
+        #print trade retcode
+        # if trade.retcode != mt5.TRADE_RETCODE_DONE:
+        #     print("2. order_send failed, retcode={}".format(trade.retcode))
         sleep(1)
         counter+=1
     log(f'opend position: {trade.order}')

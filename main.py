@@ -119,7 +119,8 @@ def run_bot(all_countries=['United States'], symbol=None, timeframe=None, risk=1
     log(message)
     while True:
         try:
-            initialize= ["51810268", "apmjgjp1", "Alpari-MT5-Demo"]
+            #initialize= ["51810268", "apmjgjp1", "Alpari-MT5-Demo"]
+            initialize= ["51834380", "4wsirwes", "Alpari-MT5-Demo"]
 
             timezone = pytz.timezone('Asia/Tehran')
             market_status = is_market_open(initialize)
