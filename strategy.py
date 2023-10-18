@@ -63,7 +63,7 @@ def PositionSize(symbol, entry, sl, risk):
 
     return np.round(lot, 2)
 
-def Open_Position(trade_info):
+def Open_Position(trade_info, max_pending_time):
     """
     This function takes a dictionary with trade information,
     including the entry point, take profit, step loss, position size, currency name and action
@@ -89,8 +89,8 @@ def Open_Position(trade_info):
     sl = np.round(trade_info['StepLoss'], digit)
     action = trade_info['Action']
     lot = np.double(trade_info['PositionSize'])
-    
-    expiration =  int((current_time() + timedelta(seconds=trade_info["PendingTime"])).timestamp())
+    #trade_info["PendingTime"]
+    expiration =  int((current_time() + timedelta(seconds=max_pending_time)).timestamp())
 
     order_type = {"Buy": mt5.ORDER_TYPE_BUY_LIMIT, "Sell": mt5.ORDER_TYPE_SELL_LIMIT}
     
@@ -125,7 +125,7 @@ def Open_Position(trade_info):
     return trade, request
 
 
-def Close_Position(trade_order, request, action, symbol, sleep_time):
+def Close_Position(trade_order, symbol, sleep_time):
     """
     Close or remove a position in MetaTrader 5.
     
@@ -140,23 +140,16 @@ def Close_Position(trade_order, request, action, symbol, sleep_time):
     sleep(sleep_time)
     counter = 0
     result = False
-    if action=='Close':
-        while not result and counter<=40:
-            result=mt5.Close(symbol=symbol,ticket=int(trade_order))
-            result=mt5.order_send({"order": trade_order, "action": mt5.TRADE_ACTION_REMOVE})
-            sleep(10)
-            counter+=1
-    if action=='Remove':
-        while not result and counter<=40:
-            if mt5.order_check(request).profit==np.double(0):
-                result=mt5.order_send({"order": trade_order, "action": mt5.TRADE_ACTION_REMOVE})
-                result=mt5.Close(symbol=symbol,ticket=int(trade_order))
-                sleep(10)
-                counter+=1
+    while not result and counter<=40:
+        result=mt5.Close(symbol=symbol,ticket=int(trade_order))
+        result=mt5.order_send({"order": trade_order, "action": mt5.TRADE_ACTION_REMOVE})
+        sleep(10)
+        counter+=1
+
     log(f'closed position: {trade_order}')
     return result
 
-def Control_Position(initialize,  trade_info, max_pending_time=2*60, max_open_time=20*60):
+def Control_Position(initialize, trade_info, max_pending_time, max_open_time):
     
     """
     Control the lifecycle of a position in MetaTrader 5.
@@ -168,21 +161,17 @@ def Control_Position(initialize,  trade_info, max_pending_time=2*60, max_open_ti
     max_open_time: int, the maximum time in seconds to keep an open trade before closing it
 
     """
-    
-    
     # Initialization
     mt5.initialize()
     mt5.login(login=initialize[0],password=initialize[1],server=initialize[2])
     
     # Open Position
-    trade, request=Open_Position(trade_info)
-    
-    if request["action"]==mt5.TRADE_ACTION_PENDING:
-        log(f"Order {trade.order} is pending for {max_pending_time}")
-        t1 = threading.Thread(target=Close_Position, args=(trade.order, request, 'Remove', trade_info['Currency'], max_pending_time))
-        t1.start()
-    
-    t1 = threading.Thread(target=Close_Position, args=(trade.order, request,'Close', trade_info['Currency'], max_open_time))
+    trade, request=Open_Position(trade_info=trade_info, max_pending_time=max_pending_time)
+    # if request["action"]==mt5.TRADE_ACTION_PENDING:
+    #     log(f"Order {trade.order} is pending for {max_pending_time}")
+    #     t1 = threading.Thread(target=Close_Position, args=(trade.order, request, 'Remove', trade_info['Currency'], max_pending_time))
+    #     t1.start()
+    t1 = threading.Thread(target=Close_Position, args=(trade.order, trade_info['Currency'], max_open_time))
     t1.start()
     # return trade.order
     

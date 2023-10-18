@@ -40,7 +40,7 @@ def news_trader(initialize, countries, symbol, timeframe, risk, timezone, num_po
                                     num_positions= num_positions, risk=risk, time_open=now)
             log(positions)
             for position in positions:
-                position[0]['order'] = Control_Position(initialize,  position[0], max_pending_time=position[0]['PendingTime'],
+                position[0]['order'] = Control_Position(initialize,  position[0], max_pending_time=position[0]["PendingTime"],
                                 max_open_time=position[0]['TimeFrame']*60*60)
                 position[1]['order'] = Control_Position(initialize,  position[1], max_pending_time=position[1]['PendingTime'],
                                 max_open_time=position[1]['TimeFrame']*60*60)
