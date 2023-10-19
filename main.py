@@ -5,7 +5,7 @@ import traceback
 import pandas as pd
 from datetime import datetime, timedelta
 
-from get_data import get_today_calendar
+from get_data import get_today_calendar, create_positions_file
 from strategy import Control_Position
 
 import MetaTrader5 as mt5
@@ -19,7 +19,7 @@ def news_trader(initialize, countries, symbol, timeframe, risk, timezone, num_po
         positions = ()
         now = pd.Timestamp('today', tzinfo=timezone).replace(tzinfo=None)
         df = get_today_calendar(countries=countries, timezone=timezone)
-        
+        df_position, file_path = create_positions_file(timezone=timezone)
         # get df from now
         next_news = df[df["Date_Time"] > now].iloc[0]
         news_index = df[df["Date_Time"] > now].index[0]
@@ -38,13 +38,18 @@ def news_trader(initialize, countries, symbol, timeframe, risk, timezone, num_po
             positions = trade_i_positions_on_news(initialize=initialize,
                                     country=next_news['Country'], news=next_news['News'],
                                     num_positions= num_positions, risk=risk, time_open=now)
+         
             log(positions)
+            for position in positions:
+                df_position = pd.concat([df_position, pd.DataFrame(position)], ignore_index=True)
+                df_position.to_csv(file_path, index=False)
+    
             for position in positions:
                 position[0]['order'] = Control_Position(initialize,  position[0], max_pending_time=position[0]["PendingTime"],
                                 max_open_time=position[0]['TimeFrame']*60*60)
                 position[1]['order'] = Control_Position(initialize,  position[1], max_pending_time=position[1]['PendingTime'],
                                 max_open_time=position[1]['TimeFrame']*60*60)
-        
+                
         # if it's news is published to 4hour return true
         # if timedelta(minutes=0) <= diff_now_last_news <= timedelta(hours=4):
         #     news_time = True
@@ -52,8 +57,9 @@ def news_trader(initialize, countries, symbol, timeframe, risk, timezone, num_po
         #     news_time = True
         else:
             news_time = False
-            
+           
         # else return false
+        
         return (news_time, positions)
     
     except AttributeError as e:
@@ -178,41 +184,45 @@ if __name__ == "__main__":
     #               symbol= None, timeframe=None, risk=100, time_open=0)
     
     # # ############ test a random news ##############
-    from news_trading import open_calc, strategy, get_tick_size
-    from get_data import get_price
-    risk = 100
-    time_open = datetime.now()
-    country='United States'
-    news="10-Year Note Auction"
-    time_frame = {'30m':0.5,'1h': 1,'1.5h': 1.5, '2h': 2, '2.5h': 2.5, '3h': 3, '3.5h': 3.5, '4h': 4,
-                '0.5':0.5, '1': 1, "1.5": 1.5, '2': 2, "2.5": 2.5, "3": 3, "3.5": 3.5, "4": 4}
-    calc_df = open_calc(path='static/MinMax Strategy Back Test.xlsx', sheetname=country)
-    # initialize = ["51545562", "zop7gsit", "Alpari-MT5-Demo"]
-    # initialize = ["51852441", "scfenm8n", "Alpari-MT5-Demo"]
-    initialize = ["51834380", "4wsirwes", "Alpari-MT5-Demo"]
-    mt5.initialize()
-    mt5.login(login=initialize[0], password=initialize[1], server=initialize[2])
+    # from news_trading import open_calc, strategy, get_tick_size
+    # from get_data import get_price
+    # risk = 100
+    # time_open = datetime.now()
+    # country='United States'
+    # news="10-Year Note Auction"
+    # time_frame = {'30m':0.5,'1h': 1,'1.5h': 1.5, '2h': 2, '2.5h': 2.5, '3h': 3, '3.5h': 3.5, '4h': 4,
+    #             '0.5':0.5, '1': 1, "1.5": 1.5, '2': 2, "2.5": 2.5, "3": 3, "3.5": 3.5, "4": 4}
+    # calc_df = open_calc(path='static/MinMax Strategy Back Test.xlsx', sheetname=country)
+    # # initialize = ["51545562", "zop7gsit", "Alpari-MT5-Demo"]
+    # # initialize = ["51852441", "scfenm8n", "Alpari-MT5-Demo"]
+    # initialize = ["51834380", "4wsirwes", "Alpari-MT5-Demo"]
+    # mt5.initialize()
+    # mt5.login(login=initialize[0], password=initialize[1], server=initialize[2])
 
-    interest_rows = calc_df[calc_df['News'].str.contains(news)]
-    interest_rows.sort_values(by=['Win Rate'], ascending = False, inplace=True)
-    symbol = interest_rows["Symbol"].iloc[0]
-    timeframe = interest_rows["News"].iloc[0].split("_")[-1]
-    open_ = get_price(initialize, symbol)
-    log(f"best symbol and timeframe by winrate: {symbol} and {timeframe}")
+    # interest_rows = calc_df[calc_df['News'].str.contains(news)]
+    # interest_rows.sort_values(by=['Win Rate'], ascending = False, inplace=True)
+    # symbol = interest_rows["Symbol"].iloc[0]
+    # timeframe = interest_rows["News"].iloc[0].split("_")[-1]
+    # open_ = get_price(initialize, symbol)
+    # log(f"best symbol and timeframe by winrate: {symbol} and {timeframe}")
 
-    positions= strategy(df= calc_df, symbol= symbol, news=news,
-                        open_= open_, time_open=time_open,
-                        multiplier=get_tick_size(symbol), timeframe=time_frame[timeframe], risk=risk)
-    log(positions)
-    # print(positions[0]['TimeFrame']*60*60)
-    # print(positions[1]['TimeFrame']*60*60)
-    positions[0]['EntryPoint'] = open_
-    positions[0]['order'] = Control_Position(initialize,  positions[0],
-                                            max_pending_time=160,
-                                            max_open_time=300)
-    positions[1]['order'] = Control_Position(initialize,  positions[1], 
-                                            max_pending_time=160,
-                                            max_open_time=300)
+    # positions= strategy(df= calc_df, symbol= symbol, news=news,
+    #                     open_= open_, time_open=time_open,
+    #                     multiplier=get_tick_size(symbol), timeframe=time_frame[timeframe], risk=risk)
+    # log(positions)
+    # #testing saved dataframe
+    # df = pd.DataFrame()
+    # df = pd.concat([df, pd.DataFrame(positions)], ignore_index=True)
+    # df.to_csv('test_positions_file.csv')  
+
+    # # print(positions[0]['TimeFrame']*60*60)
+    # # print(positions[1]['TimeFrame']*60*60)
+    # positions[0]['order'] = Control_Position(initialize,  positions[0],
+    #                                         max_pending_time=160,
+    #                                         max_open_time=300)
+    # positions[1]['order'] = Control_Position(initialize,  positions[1], 
+    #                                         max_pending_time=160,
+    #                                         max_open_time=300)
     ############## Test Multiplier Values ##############
     # import MetaTrader5 as mt5
     # from news_trading import get_tick_size
@@ -233,10 +243,10 @@ if __name__ == "__main__":
     # new_mult = {symbol:get_tick_size(symbol) for symbol in __MULTIPLIER__VALUE__.keys()}    
     # print(new_mult)
     ##### Run the bot for a day #####
-    # run_bot(all_countries=['United States', 'United Kingdom', 'Euro Zone',
-    #                        'Germany', 'Switzerland', 'Canada', 
-    #                        'Australia', 'Japan', 'New Zealand', 'China'],
-    #                        symbol=None, timeframe=None, risk=100, num_positions=3)
+    run_bot(all_countries=['United States', 'United Kingdom', 'Euro Zone',
+                           'Germany', 'Switzerland', 'Canada', 
+                           'Australia', 'Japan', 'New Zealand', 'China'],
+                           symbol=None, timeframe=None, risk=100, num_positions=3)
 
     
 

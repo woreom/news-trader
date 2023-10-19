@@ -226,6 +226,17 @@ def convert_to_gmt(requested_time):
     offset = requested_time.strftime('%z')
     return f"GMT {offset[0]}{offset[1] if offset[1]!= '0' else '' }{offset[2]}:{offset[3]}{offset[4]}"
 
+def create_positions_file(timezone):
+    now = datetime.now(timezone)
+    file_path=f'static/{now.strftime("%Y-%m-%d")}_positions.csv'
+    if os.path.exists(file_path):
+        df_positions = pd.read_csv(file_path)
+    else:    
+        df_positions = pd.DataFrame()    
+        df_positions.to_csv(file_path)
+        
+    return df_positions, file_path
+
 
 def get_today_calendar(countries: List, timezone):
     
