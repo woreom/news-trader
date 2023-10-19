@@ -230,10 +230,10 @@ def create_positions_file(timezone):
     now = datetime.now(timezone)
     file_path=f'static/{now.strftime("%Y-%m-%d")}_positions.csv'
     if os.path.exists(file_path):
-        df_positions = pd.read_csv(file_path)
+        df_positions = pd.read_csv(file_path, index_col=0)
     else:    
         df_positions = pd.DataFrame()    
-        df_positions.to_csv(file_path)
+        df_positions.to_csv(file_path, index=False)
         
     return df_positions, file_path
 
