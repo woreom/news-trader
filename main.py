@@ -40,7 +40,7 @@ def news_trader(initialize, countries, symbol, timeframe, risk, timezone, num_po
                                     num_positions= num_positions, risk=risk, time_open=now)
             log(positions)
             for position in positions:
-                position[0]['order'] = Control_Position(initialize,  position[0], max_pending_time=position[0]['PendingTime'],
+                position[0]['order'] = Control_Position(initialize,  position[0], max_pending_time=position[0]["PendingTime"],
                                 max_open_time=position[0]['TimeFrame']*60*60)
                 position[1]['order'] = Control_Position(initialize,  position[1], max_pending_time=position[1]['PendingTime'],
                                 max_open_time=position[1]['TimeFrame']*60*60)
@@ -89,61 +89,73 @@ def news_trader(initialize, countries, symbol, timeframe, risk, timezone, num_po
 
 
 def is_market_open(initialize):
-    mt5.initialize()
-    mt5.login(login=initialize[0], password=initialize[1],
-              server=initialize[2])
+    try:
+        mt5.initialize()
+        mt5.login(login=initialize[0], password=initialize[1],
+                server=initialize[2])
 
-    # get the symbol you want to check
-    symbol = "EURUSD"
+        # get the symbol you want to check
+        symbol = "EURUSD"
 
-    # get the symbol info
-    symbol_info = mt5.symbol_info(symbol)
+        # get the symbol info
+        symbol_info = mt5.symbol_info(symbol)
 
-    # check if the market is open for the symbol
-    if symbol_info.time != 0:
-        return True
-    else:
-        return False
+        # check if the market is open for the symbol
+        if symbol_info.time != 0:
+            return True
+        else:
+            return False
+    
+    except AttributeError as e:
+        if str(e) == "'NoneType' object has no attribute 'time'":
+            log(f"An exception occurred:\n{traceback.format_exc()}")
+            return False
 
     # shut down the connection to the MetaTrader 5 terminal
     # mt5.shutdown()
 
 def run_bot(all_countries=['United States'], symbol=None, timeframe=None, risk=100, num_positions=3):
-    try:
-        initialize= ["51810268", "apmjgjp1", "Alpari-MT5-Demo"]
-        message = "Starting Bot ..."
-        log(message)
-        timezone = pytz.timezone('Asia/Tehran')
+    message = "Starting Bot ..."
+    log(message)
+    while True:
+        try:
+            #initialize= ["51810268", "apmjgjp1", "Alpari-MT5-Demo"]
+            initialize= ["51834380", "4wsirwes", "Alpari-MT5-Demo"]
 
-        while is_market_open(initialize):
-            flag, positions = news_trader(initialize=initialize,
-                    countries= all_countries,
-                    symbol= symbol,
-                    timeframe= timeframe,
-                    risk= risk,
-                    timezone= timezone,
-                    num_positions= num_positions)
-            # if positions != (): log(flag, positions)
-            if flag != None:    
-                log(f"News Time? {'Yes' if flag else 'No'}")
-                for position in positions:
-                    log(f'{{order: {position[0]["order"]}, News: {position[0]["News"]}, TimeFrame: {position[0]["TimeFrame"]}, Currency: {position[0]["Currency"]}, Action: {position[0]["Action"]}, WinRate: {position[0]["WinRate"]}, RR: {position[0]["RR"]}, PositionSize: {position[0]["PositionSize"]}, EntryPoint: {position[0]["EntryPoint"]}, TakeProfit: {position[0]["TakeProfit"]}, StepLoss: {position[0]["StepLoss"]}, EntryTime: {position[0]["EntryTime"]}, PendingTime: {position[0]["PendingTime"]}, Risk: {position[0]["Risk"]}}}')
-                    log(f'{{order: {position[1]["order"]}, News: {position[1]["News"]}, TimeFrame: {position[1]["TimeFrame"]}, Currency: {position[1]["Currency"]}, Action: {position[1]["Action"]}, WinRate: {position[1]["WinRate"]}, RR: {position[1]["RR"]}, PositionSize: {position[1]["PositionSize"]}, EntryPoint: {position[1]["EntryPoint"]}, TakeProfit: {position[1]["TakeProfit"]}, StepLoss: {position[1]["StepLoss"]}, EntryTime: {position[1]["EntryTime"]}, PendingTime: {position[1]["PendingTime"]}, Risk: {position[1]["Risk"]}}}')
-                sleep(30)
-                if flag: sleep(5*60)
+            timezone = pytz.timezone('Asia/Tehran')
+            market_status = is_market_open(initialize)
+
+            if market_status == True:
+                flag, positions = news_trader(initialize=initialize,
+                        countries= all_countries,
+                        symbol= symbol,
+                        timeframe= timeframe,
+                        risk= risk,
+                        timezone= timezone,
+                        num_positions= num_positions)
+                # if positions != (): log(flag, positions)
+                if flag != None:    
+                    log(f"News Time? {'Yes' if flag else 'No'}")
+                    for position in positions:
+                        log(f'{{order: {position[0]["order"]}, News: {position[0]["News"]}, TimeFrame: {position[0]["TimeFrame"]}, Currency: {position[0]["Currency"]}, Action: {position[0]["Action"]}, WinRate: {position[0]["WinRate"]}, RR: {position[0]["RR"]}, PositionSize: {position[0]["PositionSize"]}, EntryPoint: {position[0]["EntryPoint"]}, TakeProfit: {position[0]["TakeProfit"]}, StepLoss: {position[0]["StepLoss"]}, EntryTime: {position[0]["EntryTime"]}, PendingTime: {position[0]["PendingTime"]}, Risk: {position[0]["Risk"]}}}')
+                        log(f'{{order: {position[1]["order"]}, News: {position[1]["News"]}, TimeFrame: {position[1]["TimeFrame"]}, Currency: {position[1]["Currency"]}, Action: {position[1]["Action"]}, WinRate: {position[1]["WinRate"]}, RR: {position[1]["RR"]}, PositionSize: {position[1]["PositionSize"]}, EntryPoint: {position[1]["EntryPoint"]}, TakeProfit: {position[1]["TakeProfit"]}, StepLoss: {position[1]["StepLoss"]}, EntryTime: {position[1]["EntryTime"]}, PendingTime: {position[1]["PendingTime"]}, Risk: {position[1]["Risk"]}}}')
+                    sleep(30)
+                    if flag: sleep(5*60)
+                else:
+                    log(f"flag: {flag}, position:{positions}")
             else:
-                log(f"flag: {flag}, position:{positions}")
-    except KeyboardInterrupt:
-        # quit
-        mt5.shutdown()
-        sys.exit()
+                log("market is closed")        
+        except KeyboardInterrupt:
+            # quit
+            mt5.shutdown()
+            sys.exit()
 
-    except AttributeError as e:
-        if str(e) == "'NoneType' object has no attribute 'time'":
-            log(f"An exception occurred:\n{traceback.format_exc()}")
-            return run_bot(all_countries=all_countries, symbol=symbol,
-                           timeframe=timeframe, risk=risk,
-                           num_positions=num_positions)
+        # except AttributeError as e:
+        #     if str(e) == "'NoneType' object has no attribute 'time'":
+        #         log(f"An exception occurred:\n{traceback.format_exc()}")
+        #         return run_bot(all_countries=all_countries, symbol=symbol,
+        #                     timeframe=timeframe, risk=risk,
+        #                     num_positions=num_positions)
 
     
        

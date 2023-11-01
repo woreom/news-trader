@@ -143,10 +143,11 @@ def Close_Position(trade_order, symbol, open_time):
         result=mt5.order_send({"order": trade_order, "action": mt5.TRADE_ACTION_REMOVE})
         sleep(10)
         counter+=1
+
     log(f'closed position: {trade_order}')
     return result
 
-def Control_Position(initialize,  trade_info, max_pending_time=2*60, max_open_time=20*60):
+def Control_Position(initialize, trade_info, max_pending_time, max_open_time):
     
     """
     Control the lifecycle of a position in MetaTrader 5.
@@ -158,8 +159,6 @@ def Control_Position(initialize,  trade_info, max_pending_time=2*60, max_open_ti
     max_open_time: int, the maximum time in seconds to keep an open trade before closing it
 
     """
-    
-    
     # Initialization
     mt5.initialize()
     mt5.login(login=initialize[0],password=initialize[1],server=initialize[2])
