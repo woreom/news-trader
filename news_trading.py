@@ -189,7 +189,7 @@ def trade_on_news(initialize, news, country, risk, time_open, symbol=None, timef
 
 def trade_i_positions_on_news(initialize, news, country, risk, time_open, num_positions):
     calc_df = open_calc(path='static/MinMax Strategy Back Test.xlsx', sheetname=country)
-
+    calc_df = calc_df[calc_df['News'].str.contains('_4')]
     interest_rows = calc_df[calc_df['News'].str.contains(news, regex=False)]
     interest_rows.sort_values(by=['Win Rate', "Last 12 Profit"], ascending = False, inplace=True)
     interest_rows.drop_duplicates(subset=["Symbol"], keep='first', inplace=True)
