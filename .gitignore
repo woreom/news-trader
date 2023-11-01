@@ -4,3 +4,4 @@
 *.xlsx
 **/.vscode
 log.txt
+static/*
