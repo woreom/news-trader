@@ -28,7 +28,7 @@ def news_trader(initialize, countries, symbol, timeframe, risk, timezone, num_po
         diff_now_next_news = datetime.strptime(str(next_news["Date_Time"]), "%Y-%m-%d %H:%M:%S") - now.replace(tzinfo=None)
         diff_now_last_news = now.replace(tzinfo=None) - datetime.strptime(str(df["Date_Time"].iloc[news_index-1]), "%Y-%m-%d %H:%M:%S")
 
-        if timedelta(minutes=0) <= diff_now_next_news <= timedelta(minutes=5):
+        if True:#timedelta(minutes=0) <= diff_now_next_news <= timedelta(minutes=5):
             news_time = True
             
             # positions = trade_on_news(initialize=initialize,
@@ -199,12 +199,12 @@ if __name__ == "__main__":
     # mt5.initialize()
     # mt5.login(login=initialize[0], password=initialize[1], server=initialize[2])
 
-    interest_rows = calc_df[calc_df['News'].str.contains(news)]
-    interest_rows.sort_values(by=['Win Rate'], ascending = False, inplace=True)
-    symbol = interest_rows["Symbol"].iloc[0]
-    timeframe = interest_rows["News"].iloc[0].split("_")[-1]
-    open_ = get_price(initialize, symbol)
-    log(f"best symbol and timeframe by winrate: {symbol} and {timeframe}")
+    # interest_rows = calc_df[calc_df['News'].str.contains(news)]
+    # interest_rows.sort_values(by=['Win Rate'], ascending = False, inplace=True)
+    # symbol = interest_rows["Symbol"].iloc[0]
+    # timeframe = interest_rows["News"].iloc[0].split("_")[-1]
+    # open_ = get_price(initialize, symbol)
+    # log(f"best symbol and timeframe by winrate: {symbol} and {timeframe}")
 
     # positions= strategy(df= calc_df, symbol= symbol, news=news,
     #                     open_= open_, time_open=time_open,
@@ -243,10 +243,10 @@ if __name__ == "__main__":
     # new_mult = {symbol:get_tick_size(symbol) for symbol in __MULTIPLIER__VALUE__.keys()}    
     # print(new_mult)
     ##### Run the bot for a day #####
-    # run_bot(all_countries=['United States', 'United Kingdom', 'Euro Zone',
-    #                        'Germany', 'Switzerland', 'Canada', 
-    #                        'Australia', 'Japan', 'New Zealand', 'China'],
-    #                        symbol=None, timeframe=None, risk=100, num_positions=3)
+    run_bot(all_countries=['United States', 'United Kingdom', 'Euro Zone',
+                           'Germany', 'Switzerland', 'Canada', 
+                           'Australia', 'Japan', 'New Zealand', 'China'],
+                           symbol=None, timeframe=None, risk=100, num_positions=3)
 
     
 
