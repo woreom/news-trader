@@ -63,7 +63,7 @@ def PositionSize(symbol, entry, sl, risk):
 
     return np.round(lot, 2)
 
-def Open_Position(trade_info, max_pending_time):
+def Open_Position(trade_info, pending_time):
     """
     This function takes a dictionary with trade information,
     including the entry point, take profit, step loss, position size, currency name and action
@@ -89,8 +89,8 @@ def Open_Position(trade_info, max_pending_time):
     sl = np.round(trade_info['StepLoss'], digit)
     action = trade_info['Action']
     lot = np.double(trade_info['PositionSize'])
-    #trade_info["PendingTime"]
-    expiration =  int((current_time() + timedelta(seconds=max_pending_time)).timestamp())
+    
+    expiration =  int((current_time() + timedelta(seconds=pending_time)).timestamp())
 
     order_type = {"Buy": mt5.ORDER_TYPE_BUY_LIMIT, "Sell": mt5.ORDER_TYPE_SELL_LIMIT}
     
@@ -115,9 +115,7 @@ def Open_Position(trade_info, max_pending_time):
     trade= dummy()
     while trade.order == 0 and counter<=40:
         trade = mt5.order_send(request)
-        #print trade retcode
-        # if trade.retcode != mt5.TRADE_RETCODE_DONE:
-        #     print("2. order_send failed, retcode={}".format(trade.retcode))
+        log(trade, no_print=True)
         sleep(1)
         counter+=1
     log(f'opend position: {trade.order}')
@@ -125,7 +123,7 @@ def Open_Position(trade_info, max_pending_time):
     return trade, request
 
 
-def Close_Position(trade_order, symbol, sleep_time):
+def Close_Position(trade_order, symbol, open_time):
     """
     Close or remove a position in MetaTrader 5.
     
@@ -137,7 +135,7 @@ def Close_Position(trade_order, symbol, sleep_time):
     
     """
 
-    sleep(sleep_time)
+    sleep(open_time)
     counter = 0
     result = False
     while not result and counter<=40:
