@@ -4,7 +4,7 @@ from datetime import datetime
 import warnings
 warnings.filterwarnings('ignore')
 
-def log(*args, file_path: str='log.txt'):
+def log(*args, file_path: str='log.txt', no_print=False):
     timezone = pytz.timezone('Asia/Tehran')
     now = datetime.now(timezone)
     # open the file in append mode
@@ -12,6 +12,6 @@ def log(*args, file_path: str='log.txt'):
         # write to the file
         f.write(f'[{now.strftime("%d/%m/%Y %H:%M:%S")}]{" ".join(map(str,args))}\n')
     
-    print(f'[{now.strftime("%d/%m/%Y %H:%M:%S")}]{" ".join(map(str,args))}')
+    if not no_print: print(f'[{now.strftime("%d/%m/%Y %H:%M:%S")}]{" ".join(map(str,args))}')
 
     
