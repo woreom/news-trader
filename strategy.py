@@ -165,11 +165,11 @@ def Control_Position(initialize, trade_info, max_pending_time, max_open_time):
     
     # Open Position
     np=mt5.orders_total()
-    trade, request=Open_Position(trade_info=trade_info, max_pending_time=max_pending_time)
+    trade, request=Open_Position(trade_info=trade_info, pending_time=max_pending_time)
     if mt5.orders_total() - np ==1:
         print(f"position {trade} opened succesffuly")
     else:
-        trade, request=Open_Position(trade_info=trade_info, max_pending_time=max_pending_time)        
+        trade, request=Open_Position(trade_info=trade_info, pending_time=max_pending_time)        
     # if request["action"]==mt5.TRADE_ACTION_PENDING:
     #     log(f"Order {trade.order} is pending for {max_pending_time}")
     #     t1 = threading.Thread(target=Close_Position, args=(trade.order, request, 'Remove', trade_info['Currency'], max_pending_time))

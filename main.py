@@ -28,7 +28,7 @@ def news_trader(initialize, countries, symbol, timeframe, risk, timezone, num_po
         diff_now_next_news = datetime.strptime(str(next_news["Date_Time"]), "%Y-%m-%d %H:%M:%S") - now.replace(tzinfo=None)
         diff_now_last_news = now.replace(tzinfo=None) - datetime.strptime(str(df["Date_Time"].iloc[news_index-1]), "%Y-%m-%d %H:%M:%S")
 
-        if timedelta(minutes=0) <= diff_now_next_news <= timedelta(minutes=5):
+        if True:#timedelta(minutes=0) <= diff_now_next_news <= timedelta(minutes=5):
             news_time = True
             
             # positions = trade_on_news(initialize=initialize,
@@ -126,7 +126,8 @@ def run_bot(all_countries=['United States'], symbol=None, timeframe=None, risk=1
     while True:
         try:
             #initialize= ["51810268", "apmjgjp1", "Alpari-MT5-Demo"]
-            initialize= ["51834380", "4wsirwes", "Alpari-MT5-Demo"]
+            # initialize= ["51834380", "4wsirwes", "Alpari-MT5-Demo"]
+            initialize= ["51880796", "gkve2izh", "Alpari-MT5-Demo"]
 
             timezone = pytz.timezone('Asia/Tehran')
             market_status = is_market_open(initialize)
@@ -246,7 +247,7 @@ if __name__ == "__main__":
     run_bot(all_countries=['United States', 'United Kingdom', 'Euro Zone',
                            'Germany', 'Switzerland', 'Canada', 
                            'Australia', 'Japan', 'New Zealand', 'China'],
-                           symbol=None, timeframe=None, risk=100, num_positions=3)
+                           symbol=None, timeframe=None, risk=100, num_positions=5)
 
     
 
