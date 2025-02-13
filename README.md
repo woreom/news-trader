@@ -1,4 +1,7 @@
-# news-trader
+# 📈 News Trader  
+
+A trading bot that leverages news sentiment analysis to execute trades in financial markets. This bot processes real-time news data, analyzes sentiment, and makes automated trading decisions based on predefined strategies.  
+
 
 # Troubleshoting
 Here are some comment errors and solutions
